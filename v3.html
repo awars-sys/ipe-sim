@@ -1,0 +1,1151 @@
+<title>IPE Dental Collaborator</title>
+<style>
+/* Layout: desktop EHR workstation (laptop-first). Storyboard | chart area | Secure Chat with Q1-Q4 timeline.
+   Deliberately single light theme, like a real clinical system; every colour is set explicitly. */
+:root{
+  --e-chrome:#24405f; --e-chrome-2:#2f5479; --e-chrome-fg:#f2f6fa;
+  --e-pane:#f4f6f8; --e-white:#ffffff; --e-line:#c6cfd9; --e-line-2:#dfe5eb;
+  --e-head:#e7edf3; --e-tab:#d8e2ec; --e-sel:#cfe3f6; --e-hover:#eaf2fa;
+  --e-text:#1b2631; --e-sub:#56636f; --e-link:#0a5fa3;
+  --e-story:#e6edf4; --e-story-line:#c9d6e3;
+  --e-alert:#b3261e; --e-alert-bg:#fdecea;
+  --e-bpa:#fff4cc; --e-bpa-line:#e2c35a;
+  --e-ok:#2e7d32; --e-ok-bg:#e5f3e6; --e-warn:#8a5a00; --e-warn-bg:#fff1d6;
+  --e-train:#f7d046; --e-me:#dbeafa; --e-them:#ffffff; --e-hint:#f3ecff; --e-hint-line:#cdbbf0; --e-hint-fg:#4b2f86;
+  --e-desk:#d9e0e7;
+  --font:"Segoe UI",Tahoma,Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%}
+body{background:var(--e-desk);color:var(--e-text);font-family:var(--font);font-size:13px;line-height:1.45;padding-inline:16px;padding-block:12px;box-sizing:border-box}
+*{box-sizing:border-box}
+button{font:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--e-link);outline-offset:1px}
+.scroller{height:100%;overflow:auto;border-radius:6px;box-shadow:0 2px 10px rgba(20,40,60,.18)}
+.app{min-width:1180px;height:100%;min-height:660px;display:grid;grid-template-rows:auto auto auto 1fr;background:var(--e-pane);border:1px solid var(--e-line)}
+
+/* Top chrome */
+.train{background:var(--e-train);color:#3b2f00;font-weight:700;font-size:11px;letter-spacing:.06em;text-align:center;padding:3px 8px;text-transform:uppercase}
+.top{display:flex;align-items:center;gap:2px;background:var(--e-chrome);color:var(--e-chrome-fg);padding:0 8px;height:36px}
+.logo{font-weight:700;padding:0 12px 0 4px;border-right:1px solid rgba(255,255,255,.2);margin-right:6px;display:flex;align-items:center;gap:7px}
+.logo i{width:14px;height:14px;border-radius:3px;background:#7fb4e6;display:inline-block}
+.top .act{background:none;border:0;color:inherit;padding:6px 10px;border-radius:3px}
+.top .act:hover{background:var(--e-chrome-2)}
+.top .sp{flex:1}
+.engine{font-size:11px;background:rgba(255,255,255,.14);border-radius:10px;padding:2px 9px;margin-right:8px}
+.top .user{font-size:11.5px;opacity:.85}
+.ptabs{display:flex;gap:2px;background:var(--e-chrome-2);padding:4px 8px 0}
+.ptab{background:var(--e-tab);color:var(--e-text);padding:5px 14px;border:0;border-radius:4px 4px 0 0;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.ptab:hover{background:#e6edf4}
+.ptab.on{background:var(--e-pane);font-weight:600}
+.ptab small{font-weight:400;color:var(--e-sub)}
+
+/* Body grid */
+.body{display:grid;grid-template-columns:220px minmax(0,1fr) 430px;min-height:0}
+.story{background:var(--e-story);border-right:1px solid var(--e-story-line);padding:12px;display:flex;flex-direction:column;gap:9px;overflow:auto}
+.photo{width:54px;height:54px;border-radius:50%;background:#b9c9da;display:grid;place-items:center;font-weight:700;color:#3b5671;font-size:17px}
+.pname{font-size:16px;font-weight:700}
+.pmeta{color:var(--e-sub);font-size:11.5px}
+.sb{border-top:1px solid var(--e-story-line);padding-top:7px;display:grid;gap:3px}
+.sbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--e-sub);font-weight:600}
+.allergy{background:var(--e-white);color:var(--e-sub);padding:3px 6px;border-radius:3px;border-left:3px solid var(--e-line)}
+.flag{display:inline-block;background:#fff;border:1px solid var(--e-line);border-radius:3px;padding:1px 6px;font-size:11px;margin:1px 2px 1px 0}
+.flag.warn{background:#fff1e0;border-color:#e7a54a;color:#7a4500}
+.flag.draft{background:#f3ecff;border-color:var(--e-hint-line);color:var(--e-hint-fg)}
+.abn{color:var(--e-alert);font-weight:700}
+
+.main{display:grid;grid-template-columns:132px minmax(0,1fr);min-height:0}
+.acts{background:var(--e-white);border-right:1px solid var(--e-line);padding:6px 0;display:flex;flex-direction:column}
+.acts button{background:none;border:0;text-align:left;padding:8px 12px;color:var(--e-text);border-left:3px solid transparent}
+.acts button:hover{background:var(--e-hover)}
+.acts button.on{background:var(--e-sel);border-left-color:var(--e-link);font-weight:600}
+.acts button[hidden]{display:none}
+.work{padding:10px;display:flex;flex-direction:column;gap:10px;overflow:auto;min-width:0}
+
+.bpa{background:var(--e-bpa);border:1px solid var(--e-bpa-line);border-radius:3px;padding:9px 11px;display:grid;gap:6px}
+.bpa .t{font-weight:700;font-size:12px}
+.bpa .q{font-size:13.5px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--e-white);border:1px solid var(--e-line);border-radius:3px;padding:4px 11px;color:var(--e-text)}
+.btn:hover{background:var(--e-hover)}
+.btn.pri{background:var(--e-link);border-color:var(--e-link);color:#fff}
+.btn.pri:hover{background:#084f88}
+.btn.hint{background:var(--e-hint);border-color:var(--e-hint-line);color:var(--e-hint-fg)}
+.btn.danger{color:var(--e-alert);border-color:#e3aaa6}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.panel{background:var(--e-white);border:1px solid var(--e-line);border-radius:3px;min-width:0}
+.ph{background:var(--e-head);border-bottom:1px solid var(--e-line);padding:6px 10px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ph span{font-weight:400;color:var(--e-sub);font-size:11.5px}
+.pb{padding:10px 12px;display:grid;gap:8px}
+.pb p{margin:0;max-width:85ch}
+table.grid{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.grid th{background:var(--e-head);text-align:left;font-weight:600;padding:5px 9px;border-bottom:1px solid var(--e-line);white-space:nowrap}
+.grid td{padding:5px 9px;border-bottom:1px solid var(--e-line-2);vertical-align:top}
+.grid tr:last-child td{border-bottom:0}
+.grid td.lbl{color:var(--e-sub);width:180px}
+.pill{display:inline-block;font-size:11px;font-weight:700;border-radius:10px;padding:1px 9px;white-space:nowrap}
+.pill.met{background:var(--e-ok-bg);color:var(--e-ok)}
+.pill.partly{background:var(--e-warn-bg);color:var(--e-warn)}
+.pill.not{background:var(--e-alert-bg);color:var(--e-alert)}
+.pill.none{background:var(--e-head);color:var(--e-sub)}
+.pts{display:flex;flex-wrap:wrap;gap:4px}
+.pt{font-size:11.5px;border-radius:3px;padding:1px 6px;border:1px solid var(--e-line-2)}
+.pt.y{background:var(--e-ok-bg);border-color:#b7dcb9}
+.pt.n{background:#fff;color:var(--e-sub)}
+.qlist{margin:0;padding-left:20px;display:grid;gap:8px}
+.qlist li span{color:var(--e-sub);font-size:11.5px}
+.fbtext{background:var(--e-pane);border-left:3px solid var(--e-link);padding:9px 11px;font-size:13.5px}
+.transcript{width:100%;height:160px;font:12px/1.45 Consolas,monospace;border:1px solid var(--e-line);border-radius:3px;padding:8px;resize:vertical;color:var(--e-text);background:var(--e-white)}
+.refl{margin:0;padding-left:20px;display:grid;gap:4px}
+
+/* Chat */
+.chat{background:var(--e-white);border-left:1px solid var(--e-line);display:grid;grid-template-rows:auto auto 1fr auto;min-height:0}
+.ch{background:var(--e-chrome);color:var(--e-chrome-fg);padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.ch small{display:block;opacity:.8;font-size:11px}
+.dot{width:8px;height:8px;border-radius:50%;background:#5bd37a;display:inline-block;margin-right:6px}
+.ch .btn{background:transparent;color:var(--e-chrome-fg);border-color:rgba(255,255,255,.35);font-size:11.5px;padding:3px 9px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);padding:10px 8px 8px;background:var(--e-head);border-bottom:1px solid var(--e-line)}
+.step{display:grid;justify-items:center;gap:2px;position:relative;background:none;border:0;padding:0;color:var(--e-sub);cursor:default}
+.step::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:3px;background:var(--e-line);z-index:0}
+.step:first-child::before{display:none}
+.step.done::before,.step.now::before{background:var(--e-link)}
+.step .d{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--e-white);border:2px solid var(--e-line);position:relative;z-index:1}
+.step.done{cursor:pointer;color:var(--e-text)}
+.step.done .d{background:var(--e-link);border-color:var(--e-link);color:#fff}
+.step.now{color:var(--e-text)}
+.step.now .d{border-color:var(--e-link);color:var(--e-link);box-shadow:0 0 0 3px #cfe3f6}
+.step b{font-size:11px}
+.step span{font-size:10.5px;line-height:1.2}
+.step.done:hover b{text-decoration:underline}
+.msgs{overflow:auto;background:#f7f9fb;min-height:0}
+.thread{padding:12px;display:flex;flex-direction:column;gap:9px}
+.m{max-width:88%;padding:7px 10px;border-radius:7px;border:1px solid var(--e-line-2);background:var(--e-them);white-space:pre-wrap;word-wrap:break-word}
+.m .who{font-size:10.5px;color:var(--e-sub);margin-bottom:2px;white-space:normal}
+.m.me{align-self:flex-end;background:var(--e-me);border-color:#bcd6f0}
+.m.hint{background:var(--e-hint);border-color:var(--e-hint-line)}
+.m.hint .who{color:var(--e-hint-fg);font-weight:600}
+.m.share{background:#f0f7ee;border-color:#bfdcb9}
+.m.share .who{color:var(--e-ok);font-weight:600}
+.sys{align-self:center;font-size:10.5px;color:var(--e-sub);background:var(--e-head);padding:2px 10px;border-radius:10px}
+.div{align-self:stretch;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--e-link);margin-top:4px}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--e-line)}
+.card{align-self:stretch;border:1px solid var(--e-line);border-radius:6px;background:var(--e-white);padding:10px 11px;display:grid;gap:8px}
+.card h4{margin:0;font-size:12.5px}
+.card p{margin:0}
+.opt{text-align:left;background:var(--e-pane);border:1px solid var(--e-line);border-radius:5px;padding:7px 9px;display:grid;grid-template-columns:22px 1fr;gap:6px;color:var(--e-text)}
+.opt:hover:not(:disabled){background:var(--e-hover);border-color:var(--e-link)}
+.opt b{color:var(--e-link)}
+.opt.picked{border-color:var(--e-link);background:var(--e-sel)}
+.opt:disabled{cursor:default}
+.typing{align-self:flex-start;font-size:11px;color:var(--e-sub);font-style:italic}
+.guide{display:grid;gap:7px;margin:0;padding:0;list-style:none;counter-reset:g}
+.guide li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+.guide li::before{counter-increment:g;content:counter(g);width:20px;height:20px;border-radius:50%;background:var(--e-sel);color:var(--e-link);font-weight:700;font-size:11px;display:grid;place-items:center}
+.compose{border-top:1px solid var(--e-line);padding:8px;display:grid;gap:6px;background:var(--e-white)}
+.compose textarea{width:100%;resize:none;height:62px;border:1px solid var(--e-line);border-radius:3px;padding:6px 7px;font:inherit;color:var(--e-text);background:var(--e-white)}
+.compose .row{justify-content:space-between}
+.tries{font-size:11px;color:var(--e-sub)}
+.confirm{background:var(--e-alert-bg);border:1px solid #e3aaa6;border-radius:4px;padding:6px 8px;display:flex;gap:6px;align-items:center;justify-content:space-between;font-size:12px}
+
+/* Modal */
+.modal{position:fixed;inset:0;background:rgba(20,32,45,.45);display:grid;place-items:center;z-index:20;padding:16px}
+.modal .box{background:var(--e-white);border-radius:6px;max-width:620px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden}
+.modal .ph{font-size:14px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--e-text);color:#fff;padding:7px 14px;border-radius:5px;font-size:12.5px;z-index:30}
+/* Reference values + resources */
+.grid td.ref{min-width:250px}
+.bands{display:grid;gap:1px}
+.bands span{font-size:11.5px;color:var(--e-sub);padding:0 5px;border-radius:3px}
+.bands span.hit{background:var(--e-sel);color:var(--e-text);font-weight:700}
+.src{display:block;font-size:10.5px;color:var(--e-sub);margin-top:3px;padding-left:5px}
+.foot{border-top:1px solid var(--e-line-2);padding:7px 10px;font-size:11.5px;color:var(--e-sub);line-height:1.5}
+.foot a,.ph a{color:var(--e-link)}
+.grid.res td:first-child{width:150px}
+.sub{font-size:11px;color:var(--e-sub)}
+ul.tight{margin:4px 0 0;padding-left:18px}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+
+<div class="scroller">
+<div class="app" id="app">
+  <div class="train">Training environment · simulated patient · not for clinical use</div>
+  <div class="top">
+    <span class="logo"><i></i>IPE Sim EHR</span>
+    <button class="act" type="button" id="btn-guide">How it works</button>
+    <button class="act" type="button" data-goto="chart">Chart</button>
+    <button class="act" type="button" data-goto="info">Patient Info</button>
+    <span class="sp"></span>
+    <span class="engine" id="engine-badge">Practice engine · no AI</span>
+    <span class="user">PharmD Student · PHAR 462</span>
+  </div>
+  <div class="ptabs" id="ptabs" role="tablist" aria-label="Patients"></div>
+  <div class="body">
+    <aside class="story" id="story" aria-label="Patient storyboard"></aside>
+    <div class="main">
+      <nav class="acts" id="acts" aria-label="Chart activities">
+        <button type="button" data-view="chart" class="on">Chart Review</button>
+        <button type="button" data-view="info">Patient Info</button>
+        <button type="button" data-view="meds">Medications</button>
+        <button type="button" data-view="tobacco">Tobacco</button>
+        <button type="button" data-view="resources">IPE Resources</button>
+        <button type="button" data-view="feedback" hidden>Feedback</button>
+      </nav>
+      <div class="work" id="work"></div>
+    </div>
+    <aside class="chat" aria-label="Secure Chat">
+      <div class="ch">
+        <div><span class="dot"></span><b>Maya Chen</b><small id="chat-sub">Dental Student (D2)</small></div>
+        <button class="btn" type="button" id="btn-copy-top" hidden>Copy chat</button>
+      </div>
+      <div class="steps" id="steps" aria-label="Simulation timeline"></div>
+      <div class="msgs" id="msgs"></div>
+      <div class="compose" id="compose">
+        <div class="confirm" id="confirm-end" hidden><span>End now? You'll get feedback on what you've done so far.</span><span class="row"><button class="btn danger" type="button" id="end-yes">End Simulation</button><button class="btn" type="button" id="end-no">Keep going</button></span></div>
+        <textarea id="input" aria-label="Message Maya" placeholder="Click Start Simulation to begin"></textarea>
+        <div class="row">
+          <span class="row"><button class="btn hint" type="button" id="btn-hint">Ask Maya for a hint (3 left)</button><span class="tries" id="tries"></span></span>
+          <span class="row"><button class="btn" type="button" id="btn-end">End Simulation</button><button class="btn pri" type="button" id="btn-send">Send</button></span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="ph"><b id="modal-title">How the simulation works</b><button class="btn" type="button" id="modal-close">Close</button></div>
+    <div class="pb" id="modal-body"></div>
+  </div>
+</div>
+
+<script>
+/* =====================================================================
+   CONFIG: change these without touching the rest of the file
+   ===================================================================== */
+const CONFIG = {
+  engine: "practice",                  // "practice" = offline keyword engine (no cost). "claude" = live, via your server function
+  apiUrl: "/.netlify/functions/maya",  // only used when engine is "claude"
+  botName: "Maya Chen",
+  botRole: "Dental Student (D2)",
+  maxTries: 3,                         // tries per question before Maya moves on
+  maxHints: 3,                         // "Ask Maya for a hint" presses allowed per case
+  caseOrder: ["margaret", "lucy", "brian"],
+  startCase: "margaret"
+};
+
+const STEPS = [
+  {k:"Q1", label:"Scope of practice"},
+  {k:"Q2", label:"Referrals"},
+  {k:"Q3", label:"Treatment plan"},
+  {k:"Q4", label:"Joint plan"},
+  {k:"End", label:"Feedback"}
+];
+
+/* =====================================================================
+   REFERENCE SCALES (shown in the Tobacco tab and IPE Resources)
+   ===================================================================== */
+const LINKS = {
+  ftnd: "https://www.aarc.org/wp-content/uploads/2014/08/Fagerstrom_test.pdf",
+  co: "https://www.asthmaandlung.org.uk/symptoms-tests-treatments/tests/exhaled-carbon-monoxide"
+};
+function bands(list, hit){
+  return `<div class="bands">${list.map((b,i)=>`<span class="${i===hit?"hit":""}">${b}</span>`).join("")}</div>`;
+}
+const FTND = ["1–2 = low dependence","3–4 = low to moderate dependence","5–7 = moderate dependence","8+ = high dependence"];
+const ftndRef = (score) => bands(FTND, score==null?-1:score<=2?0:score<=4?1:score<=7?2:3) + `<span class="src">Fagerström Test<sup>1</sup></span>`;
+const CO = ["1–4 ppm: low, normal even in non-smokers","5–9 ppm: mild, may smoke or be exposed to second-hand smoke","10+ ppm: high, common if you smoke"];
+const coRef = (ppm) => bands(CO, ppm<5?0:ppm<10?1:2) + `<span class="src">Exhaled CO test<sup>2</sup> · case sheet: &lt;6 ppm non-smoker</span>`;
+const TTFC = ["Within 5 minutes = 3 points","5–30 minutes = 2 points","31–60 minutes = 1 point"];
+const ttfcRef = (i) => bands(TTFC, i) + `<span class="src">Fagerström item 1<sup>1</sup></span>`;
+const CPD = ["10 or less = 0 points","11–20 = 1 point","21–30 = 2 points","31 or more = 3 points"];
+const cpdRef = (i) => bands(CPD, i) + `<span class="src">Fagerström item 4<sup>1</sup></span>`;
+const READY = "0 (not ready) to 10 (very ready) to quit in the next 30 days";
+
+/* Referral types used to check "names 3 referrals" (no ranking needed) */
+const REFS = [/dent/i,/pharmac/i,/primary care|\bpcp\b|physician|\bdoctor\b/i,/counsel|psycholog|therap/i,/psychiat/i,/dietit|dietic|nutrition/i,/social work/i,/pulmon/i];
+const threeRefs = (who) => ({id:"three",label:"Names 3 referrals or consultations",count:REFS,min:3,ack:"Good, that's three solid referrals.",
+  hints:[`Which professionals would you want on ${who}'s team? Try to name three.`,"Think beyond pharmacy and dentistry. Who else could help with the other things going on in the case?","Possible referrals include dental, pharmacy, primary care, counselor, psychiatrist, dietitian and social worker. Which three fit best?"]});
+const whyPoint = (extra) => ({id:"why",label:"Explains the reason for each referral",re:new RegExp("because|since|due to|given|so that|so (she|he)|as (she|he)|to (help|treat|address|manage|refit|review|start|support)|for (her|his)|risk"+(extra?"|"+extra:""),"i"),ack:"Thanks for explaining your reasoning.",
+  hints:["Can you tell me why you picked those three?","What would each referral do for the patient?","Give one reason for each of your three referrals."]});
+
+/* =====================================================================
+   CASE DATA + RUBRICS
+   Lucy: Chatbot Prompt answer key (CO 24 ppm used throughout).
+   Margaret: Case 3 Facilitator Guide with solutions.
+   Brian: DRAFT key written for testing. Faculty to confirm.
+   Each rubric point: id, label, re (keywords for the practice engine),
+   ack (Maya's line when it's covered), hints (light, clear, strong).
+   Info values can be a string or a list of lines.
+   ===================================================================== */
+const CASES = {
+lucy: {
+  tab:"Lucy", tag:"Case 1", initials:"LT", mrn:"SIM-0412", age:"49 y.o. Female", draft:false, pron:"her",
+  flags:[["Current smoker","warn"],["Oral lesion","warn"]],
+  problems:["Leukoplakia, buccal mucosa","Asthma, well controlled","Generalized anxiety disorder","Hypertension","Gingivitis"],
+  tobacco:["5 cigarettes/day (was 1 ppd)","First cigarette on waking","CO <b class='abn'>24 ppm</b>","Readiness 5/10"],
+  scenario:"Lucy is a 49-year-old female who presents to clinic today complaining of sore, white patches in her mouth and experiences pain when brushing her teeth or eating hard foods. The sores are preventing her from practicing good oral hygiene. She is currently smoking 5 cigarettes/day. She quit smoking for 2 weeks but recently lost her job and now feels very anxious. Prior to quitting smoking, she smoked a pack of cigarettes every day. Lucy says she is a \"5\" out of \"10\" for readiness to quit smoking in the next 30 days. She has not had to use her albuterol this week. She reports good adherence with her other medications. She does not report any shortness of breath or nighttime symptoms of asthma.",
+  encounters:[["Today","Office Visit","Dental Clinic","Maya Chen, D2","Sore white patches, pain when brushing or eating"],["Today","IPE Consult","Pharmacy","You","Consult requested by dental"]],
+  info:[["Name","Lucy"],["Age","49-years-old"],["Gender","Female"],
+    ["Medical history",["Generalized anxiety disorder","Gingivitis","Asthma, well controlled","Hypertension"]],
+    ["Family history",["Mother: alive at 79; head and neck squamous cell carcinoma, HTN, hyperlipidemia","Father: alive at 81; HTN, DM, Asthma","Single, no children"]],
+    ["Social history",["Tobacco: started age 14; 5-20 non-menthol cigarettes/day, first cigarette immediately after waking","Triggers: stress, other smokers","Previous quit smoking attempts: quit smoking for 2 weeks recently (“cold turkey”, with no medications)","Reason for relapse- lost her job and started smoking again.","Alcohol and illicit: smokes marijuana daily to help with anxiety","Diet: chicken, veggies, and pasta, candy at night while watching TV","Candy/sweets consumption has increased since she tried to quit smoking","Living environment: lives alone but frequently spends time with her neighbor, who smokes","Occupation: unemployed"]],
+    ["Dental history","Leukoplakia – white patches on buccal mucosa. Painful while brushing and eating."],
+    ["Drug history",["Albuterol 90 mcg HFA, 2 inhalations every 4-6 hours as needed for shortness of breath","Symbicort (budesonide/formoterol 160/4.5 mcg) 2 inhalations twice daily","Zoloft (sertraline) 50 mg PO once daily","Lisinopril 20 mg PO once daily"]],
+    ["Physical exam",["Ht 175.3 cm Wt 99.8 kg BMI 32.5","BP 130/80 P 90","Renal and liver function within normal limits","Carbon monoxide 24 ppm (<6 ppm non- smoker)","Intraoral examination shows signs of leukoplakia on buccal mucosa."]],
+    ["Occupation","Unemployed (ex-Factory worker)"]],
+  meds:[["Albuterol 90 mcg HFA","2 inhalations every 4-6 hours as needed for shortness of breath","Asthma"],["Symbicort (budesonide/formoterol 160/4.5 mcg)","2 inhalations twice daily","Asthma"],["Zoloft (sertraline) 50 mg","PO once daily","Anxiety"],["Lisinopril 20 mg","PO once daily","Hypertension"]],
+  flow:[["Smoking status","Current, 5 cigarettes/day (range 5–20; was 1 pack/day before her quit attempt)",cpdRef(0)],
+    ["Time to first cigarette","Immediately after waking",ttfcRef(0)],
+    ["Exhaled CO","<span class='abn'>24 ppm</span>",coRef(24)],
+    ["Readiness to quit (next 30 days)","5 / 10",READY],
+    ["Fagerström score","Not given in this case",ftndRef(null)],
+    ["Past quit attempts","2 weeks, cold turkey, no medicines; relapsed after job loss",""],
+    ["Triggers","Stress, other smokers",""],
+    ["Other substances","Marijuana daily for anxiety",""]],
+  intro:"Hi! I'm Maya Chen, the D2 dental student on Lucy's care team. I just saw her for those painful white patches on her buccal mucosa, and we're treating it as leukoplakia, so her smoking really worries me. Before I share the dental side: is there anything you noticed as a student pharmacist to assess her needs?",
+  reflectOn:"managing a patient struggling with socioeconomic setbacks and substance relapse",
+  qs:[
+    { text:"Is there anything you noticed as a student pharmacist to assess Lucy's needs?",
+      ask:null,
+      must:["rinse","thrush"],
+      points:[
+        {id:"rinse",label:"Rinse and spit after each Symbicort dose",re:/rins|spit|gargl|swish/i,ack:"Yes, rinsing and spitting after Symbicort is a great catch.",
+          hints:["Take another look at her medication list. Is anything she inhales every day relevant to her mouth pain?","Her Symbicort contains an inhaled steroid. What could you counsel her to do right after each dose?","Think about the steroid left in her mouth after each Symbicort puff. What simple step after every dose would clear it?"]},
+        {id:"thrush",label:"Links the inhaled steroid to oral thrush",re:/thrush|candid|fung|yeast/i,ack:"Good, thrush on top of her leukoplakia would make her mouth pain even worse.",
+          hints:["What oral side effect could her inhaled steroid cause?","Inhaled steroids can lead to an infection in the mouth. Which one?","The steroid in Symbicort can cause a fungal infection in the mouth. How would that affect her sores?"]},
+        {id:"spacer",label:"Suggests a spacer",re:/spacer|chamber|valved/i,ack:"A spacer is a nice addition too.",
+          hints:["Is there a device that could cut down how much medicine lands in her mouth?","Some patients use an add-on device with their inhaler to reduce what deposits in the mouth. Would that help Lucy?","Would a spacer make sense with her Symbicort?"]},
+        {id:"tech",label:"Reviews inhaler technique",re:/techniq|prim(e|ing)|shake|breath|exhale|inhaler (use|counsel)/i,ack:"Checking her technique overall is smart.",
+          hints:["Beyond side effects, what else about her inhaler use could you check?","When did someone last watch her use her inhalers?","Inhaler technique pointers like priming and breathing could help. Would you review them?"]}
+      ],
+      pass:"That's exactly the kind of pharmacy input I was hoping for.",
+      share:"Here's what a complete pharmacy answer covers: counsel her to rinse and spit after every Symbicort dose, because it limits the steroid left in her mouth and helps prevent oral thrush, which would worsen her mouth pain. A spacer also lowers the risk, and it's worth reviewing her inhaler technique (priming, breathing, holding her breath).",
+      perspective:"From the dental side, leukoplakia shows up as white or gray patches, often because something like tobacco is irritating the mouth, and it can raise her risk of oral cancer, which matters even more with her mom's head and neck cancer. I'll do a biopsy, since that's the only way to know whether it could become cancer, and I'll advise her to stop tobacco now."
+    },
+    { text:"If you are the first health professional to encounter Lucy, which referrals or consultations would you make? Name your top 3 and explain why.",
+      ask:"Next one. If you were the first health professional to see Lucy, which referrals or consultations would you make? Name your top 3 and tell me why.",
+      must:["three","dental","mental","why"],
+      points:[
+        threeRefs("Lucy"),
+        {id:"dental",label:"Includes dental (biopsy of the leukoplakia)",re:/dent|biops|oral (surg|med)/i,ack:"Agreed, the biopsy can't wait.",
+          hints:["Which of her problems could be the most serious if it waited?","Her white patches need a definite diagnosis. Who would you send her to?","Leukoplakia needs a biopsy. Is dentistry on your list?"]},
+        {id:"mental",label:"Includes a counselor or psychiatrist for anxiety",re:/counsel|psych|therap|mental|behavio/i,ack:"Good call on support for her anxiety.",
+          hints:["What's driving her relapse right now?","She's anxious after losing her job and uses marijuana for anxiety. Who could help with that?","Would a counselor or psychiatrist belong in your top 3?"]},
+        {id:"pharm",label:"Includes pharmacy (inhaler counseling, cessation support)",re:/pharmac/i,ack:"And pharmacy has a clear role too.",
+          hints:["Where does your own profession fit?","Who would handle her Symbicort counseling and cessation medicines later on?","Would you include pharmacy?"]},
+        whyPoint("cancer|relapse|anxiety|driv")
+      ],
+      pass:"I like those choices.",
+      share:"Here's how a complete answer could look: possible referrals are dental, pharmacy, primary care, counselor, psychiatrist, dietitian and social worker. A strong top 3 is dental (biopsy of the leukoplakia), pharmacy (Symbicort counseling and cessation support), and a counselor or psychiatrist for her anxiety, each with a reason.",
+      perspective:"I'd definitely include dental, because the biopsy tells us whether this could become oral cancer. Her anxiety is what pulled her back to smoking, so counseling or psychiatry belongs in there too."
+    },
+    { text:"Based on Lucy's readiness to quit score, CO level and time to first cigarette, provide a tobacco dependence treatment plan.",
+      ask:"Here's what I keep thinking about. Lucy says she's a 5/10 on readiness, but her CO is 24 ppm and she smokes right when she wakes up. Using the 5 As, what tobacco dependence treatment plan would you suggest?",
+      must:["depend","readiness","fiveR"],
+      flag:{re:/quit date|set a date|(start|begin) (her )?(on )?(the )?(patch|varenicline|chantix|bupropion|nrt)/i,msg:"Hmm, she's only a 5/10. Would she really follow a quit date or start a medicine right now? How could we work with her ambivalence first?"},
+      points:[
+        {id:"depend",label:"Assess: high dependence (smokes on waking, CO 24 ppm)",re:/depend|first cigarette|wak|carbon monoxide|\bco\b|24/i,ack:"Right, smoking on waking and a CO of 24 point to high dependence.",
+          hints:["What do her CO level and time to first cigarette tell you?","Smoking right after waking is a classic marker of something. What is it?","Her first cigarette on waking and CO of 24 ppm suggest how strong a nicotine dependence?"]},
+        {id:"readiness",label:"Assess: ambivalent, not ready yet (5/10)",re:/contemplat|ambivalen|not ready|unsure|5 ?\/ ?10|5 out of 10|readiness/i,ack:"Yes, 5/10 tells us she's ambivalent.",
+          hints:["What does her 5/10 readiness score say about where she is?","Is she ready to quit in the next 30 days, or still thinking about it?","A 5/10 suggests she's in contemplation. How would that change your plan?"]},
+        {id:"fiveR",label:"Assist: 5 Rs / motivational approach, no forced quit date",re:/5 ?r|five r|relevan|roadblock|reward|repetition|motivation(al)? interview|\bmi\b/i,ack:"The 5 Rs fit her really well.",
+          hints:["For someone who isn't ready yet, which counseling framework fits better than a quit plan?","There's a 5-part approach for patients who are ambivalent about quitting. It's in the IPE Resources tab.","Think Relevance, Risks, Rewards, Roadblocks and Repetition. How would you use them with Lucy?"]},
+        {id:"advise",label:"Advise: clear, personal advice to quit",re:/advis|benefit|health|cancer|asthma|blood pressure/i,ack:"Linking quitting to her own health makes the advice stick.",
+          hints:["What would you advise her, and how would you make it personal?","How might quitting help her mouth, asthma or blood pressure?","Connect the advice to her sores and her mom's cancer history."]},
+        {id:"arrange",label:"Arrange: quitline, resources or specialist follow-up",re:/quitline|quit ?now|800|refer|follow|specialist|clinic|resource/i,ack:"Good, having follow-up lined up matters.",
+          hints:["What would you arrange for after today?","Which resources could she use between visits?","A quitline number and a referral to a cessation clinic would cover Arrange."]}
+      ],
+      pass:"That's a really thoughtful plan for where she is right now.",
+      share:"Here's a complete plan. Ask: we already know her smoking history. Advise: quitting will help her mouth, asthma and blood pressure, and nicotine withdrawal adds to stress. Assess: she's in contemplation; smoking on waking shows high dependence, CO 24 ppm is high, and 5/10 shows ambivalence. Assist: use the 5 Rs (what she likes and dislikes about smoking, her goals like a new job and saving money, what helped her quit before, whether her neighbor might quit with her) and let her know medicines are there when she's ready, rather than forcing a quit date. Arrange: quitline or online resources and a referral to a cessation clinic.",
+      perspective:"Chairside, I can keep reinforcing the 5 Rs, especially how smoking affects her mouth sores, and remind her that help with cravings is there when she's ready."
+    },
+    { text:"Write a brief joint summary plan for Lucy's file.",
+      ask:"Let's wrap up. Can you write a brief joint summary plan for Lucy's file, covering what pharmacy and dentistry will each do?",
+      must:["pharm","dent","tob"],
+      points:[
+        {id:"pharm",label:"Pharmacy's part (Symbicort counseling, thrush prevention)",re:/symbicort|thrush|rins|spacer|inhaler|pharmac/i,ack:"",hints:["What will pharmacy do for her?","Include your Symbicort counseling.","Add the rinse-and-spit and spacer advice for pharmacy."]},
+        {id:"dent",label:"Dentistry's part (biopsy, oral care)",re:/biops|leukoplak|dent|oral exam/i,ack:"",hints:["What will dentistry do?","Don't forget my part of the plan.","Add the biopsy of the leukoplakia."]},
+        {id:"ref",label:"Referral to counseling or psychiatry",re:/refer|counsel|psych|mental/i,ack:"",hints:["Who else is on her team?","Add the referral for her anxiety.","Include counseling or psychiatry."]},
+        {id:"tob",label:"Tobacco plan (5 Rs while ambivalent)",re:/5 ?r|motivat|cessation|quit|readiness|ambivalen/i,ack:"",hints:["What's the plan for her smoking?","Summarize the tobacco plan.","Add the 5 Rs approach for now."]},
+        {id:"follow",label:"Follow-up arranged",re:/follow|arrange|quitline|reassess|next visit|check in/i,ack:"",hints:["When will we see her again?","Add a follow-up.","Include the quitline or a follow-up visit."]}
+      ],
+      pass:"Perfect, that's a clear plan for her chart.",
+      share:"Here's a joint plan we could file: Pharmacy will counsel Lucy to rinse and spit after each Symbicort dose, consider a spacer and review inhaler technique. Dentistry will biopsy the leukoplakia and support her oral hygiene. We'll refer her to a counselor or psychiatrist for anxiety, use the 5 Rs while she's ambivalent, and arrange quitline resources and follow-up.",
+      perspective:null
+    }
+  ]
+},
+brian: {
+  tab:"Brian", tag:"Case 2", initials:"BR", mrn:"SIM-0418", age:"31 y.o. Male", draft:true, pron:"his",
+  flags:[["Former smoker, 4 wks","warn"],["Tooth pain","warn"],["Draft key","draft"]],
+  problems:["Cavitated lower left first molar","Generalized periodontitis","Allergic rhinitis, nasal polyps","Hypothyroidism"],
+  tobacco:["Smoke-free 4 weeks","On varenicline","CO 4 ppm","Motivation 9/10"],
+  scenario:"Brian is a 31-year-old male who comes into clinic today complaining of severe tooth pain in his mouth's back left quadrant. This pain started a few days ago. He has taken acetaminophen and had some pain relief. Brian is a former smoker who has been smoke-free for 4 weeks now. When asked about his motivation to remain abstinent from tobacco he says he is a \"9\" out of \"10\". Since quitting smoking, he has gained about 10 lbs., and he feels like his allergies are worse. He is also having strong cravings for a cigarette because he is going through a stressful divorce. Brian admits to having trouble remembering to take his medications.",
+  encounters:[["Today","Urgent Visit","Dental Clinic","Maya Chen, D2","Severe pain, back left quadrant, started a few days ago"],["Today","IPE Consult","Pharmacy","You","Consult requested by dental"]],
+  info:[["Name","Brian"],["Age","31-year-old"],["Gender","Male"],
+    ["Medical history",["Allergic rhinitis","Nasal polyps","Hypothyroidism"]],
+    ["Family history",["Married and has 2 children. He is currently in the process of divorce.","Mother: alive at 61; hypothyroidism","Father: alive at 64; HTN, allergic rhinitis"]],
+    ["Social history",["Tobacco: Former menthol cigarettes ½ ppd started smoking age 24, previously would smoke within 30 minutes of waking; Quit smoking to be a good role model for his children (10 and 8 years old)","Alcohol/Illicit drugs; 2-4 beers on the weekends","Diet: chicken, steak, mashed potatoes, and French fries, little to no vegetables","Exercise: plays basketball outside after work, but allergies are making exercise challenging","Living environment: Lives with wife and 2 children (all nonsmokers)","Occupation: engineer at a small tech company"]],
+    ["Dental history","Generalized periodontitis and cavitated lower left first molar"],
+    ["Drug history",["Flonase (fluticasone propionate): 1 spray in each nostril daily","Synthroid (levothyroxine sodium): 100 mcg PO once daily","Montelukast: 10 mg PO once daily in the evening","Varenicline: 1 mg PO BID with food"]],
+    ["Physical exam",["Ht 177.8 cm Wt 113 kg BMI 35.9","BP 120/80 P 62","Carbon monoxide 4 ppm (<6 ppm non-smoker)","Renal and liver function within normal limits","Intraoral examination reveals generalized periodontitis and cavitated lesion on left lower molar."]]],
+  meds:[["Flonase (fluticasone propionate)","1 spray in each nostril daily","Allergic rhinitis"],["Synthroid (levothyroxine sodium) 100 mcg","PO once daily","Hypothyroidism"],["Montelukast 10 mg","PO once daily in the evening","Allergic rhinitis"],["Varenicline 1 mg","PO BID with food","Smoking cessation"]],
+  flow:[["Smoking status","Former smoker, smoke-free 4 weeks (was ½ ppd menthol)",cpdRef(0)],
+    ["Time to first cigarette (before quitting)","Within 30 minutes of waking",ttfcRef(1)],
+    ["Exhaled CO","4 ppm",coRef(4)],
+    ["Motivation to stay quit","9 / 10","0 (not motivated) to 10 (very motivated)"],
+    ["Fagerström score","Not given in this case",ftndRef(null)],
+    ["Current cessation medicine","Varenicline 1 mg BID",""],
+    ["Since quitting","Gained about 10 lbs; strong cravings with divorce stress",""]],
+  intro:"Hi! I'm Maya Chen, the D2 dental student on Brian's team. He came in with severe pain in his back left molar, and I found a cavitated lesion on his lower left first molar plus generalized periodontitis. He's 4 weeks smoke-free, which is great, but he's under a lot of stress. Is there anything you noticed as a student pharmacist to assess his needs?",
+  reflectOn:"helping a patient stay smoke-free through major life stress",
+  qs:[
+    { text:"Is there anything you noticed as a student pharmacist to assess Brian's needs?",
+      ask:null, must:["adh","var"],
+      points:[
+        {id:"adh",label:"Adherence support for missed doses",re:/adher|remind|pill ?(box|organi)|alarm|routine|forget|calendar|app\b/i,ack:"Memory aids could really help him.",
+          hints:["He mentioned something about taking his medicines. What stood out?","Brian says he has trouble remembering his meds. What could you do about that?","With four daily medicines, which tools or routines could help him remember each dose?"]},
+        {id:"var",label:"Varenicline counseling (keep taking it, full course)",re:/varenicline|chantix/i,ack:"Good, keeping him on varenicline matters a lot right now.",
+          hints:["Which medicine on his list is helping him stay smoke-free?","He's on varenicline. What would you counsel him on, given he's only 4 weeks in?","Think about how long a varenicline course runs and what happens if he misses doses."]},
+        {id:"crave",label:"Short-acting NRT for breakthrough cravings",re:/nrt|nicotine (gum|lozenge)|gum|lozenge|crav|short.?acting/i,ack:"Having something for breakthrough cravings is a smart idea.",
+          hints:["Is there anything that could help with his strong cravings?","Some patients add a short-acting product during stressful times.","Would short-acting NRT for breakthrough cravings fit here?"]},
+        {id:"allergy",label:"Reviews allergy medicines (Flonase, montelukast)",re:/flonase|fluticasone|montelukast|singulair|allerg|nasal/i,ack:"Good to look at his allergy treatment too.",
+          hints:["He says his allergies feel worse. Anything there for pharmacy?","Would you check how he's using his nasal spray?","Montelukast carries a warning about mood changes. Worth watching with his stress?"]},
+        {id:"pain",label:"Pain management advice",re:/acetaminophen|tylenol|ibuprofen|nsaid|analges|pain/i,ack:"Thanks for thinking about his pain.",
+          hints:["He's in a lot of pain. Anything you'd add?","He's taken acetaminophen with some relief. Would you suggest anything else until his dental visit?","A short-term pain plan would help him get to treatment."]}
+      ],
+      pass:"That's really helpful from the pharmacy side.",
+      share:"Here's what a complete answer could cover: adherence support (pill organizer, phone reminders, pairing doses with daily routines), counseling to keep taking varenicline as prescribed for the full course, and possibly short-acting NRT for breakthrough cravings. You could also add a short-term pain plan and a check of his allergy medicines.",
+      perspective:"On the dental side, the cavitated lower left first molar is the likely cause of his pain, so he needs a restoration or possibly a root canal or extraction. His periodontitis needs scaling and root planing, and staying smoke-free will help his gums heal."
+    },
+    { text:"If you are the first health professional to encounter Brian, which referrals or consultations would you make? Name your top 3 and explain why.",
+      ask:"Next one. If you were the first health professional to see Brian, which referrals or consultations would you make? Name your top 3 and tell me why.",
+      must:["three","dental","stress","why"],
+      points:[
+        threeRefs("Brian"),
+        {id:"dental",label:"Includes dental (tooth pain, periodontitis)",re:/dent|tooth|molar|root canal/i,ack:"Agreed, his pain needs dental care soon.",
+          hints:["Which problem brought him in today?","He's in severe pain. Who treats that?","Is dentistry in your top 3?"]},
+        {id:"stress",label:"Includes support for divorce stress (social worker or psychologist)",re:/psych|counsel|therap|social work|mental|stress|divorce/i,ack:"Yes, the divorce stress is his biggest relapse risk.",
+          hints:["What's the biggest threat to him staying smoke-free?","He's going through a stressful divorce. Who could help?","Would a social worker or psychologist belong in your top 3?"]},
+        {id:"pharm",label:"Includes pharmacy (adherence, varenicline)",re:/pharmac/i,ack:"And pharmacy can help with his adherence.",
+          hints:["Where does your own profession fit?","Who would help with his missed doses and varenicline?","Would you include pharmacy?"]},
+        whyPoint("relapse|pain|crav")
+      ],
+      pass:"I agree with those choices.",
+      share:"Here's how a complete answer could look: possible referrals are dental, pharmacy, primary care, social worker or psychologist, dietitian and psychiatrist. A strong top 3 is dental (severe tooth pain and periodontitis), pharmacy (adherence and varenicline), and a social worker or psychologist (divorce stress is his biggest relapse risk), each with a reason.",
+      perspective:"Dental has to be in there because he's in pain. Support for the divorce stress matters just as much, since that's what could pull him back to smoking."
+    },
+    { text:"Based on Brian's readiness to quit score, CO level and time to first cigarette, provide a tobacco dependence treatment plan.",
+      ask:"His CO is 4 ppm and he says he's a 9/10 to stay quit, but the cravings are strong with the divorce. Using the 5 As, what's our tobacco plan for him?",
+      must:["abst","relapse","meds"],
+      flag:{re:/5 ?rs|five rs|relevance|roadblock/i,msg:"The 5 Rs are for people who aren't ready to quit yet. Brian has already quit. What does he need now to stay quit?"},
+      points:[
+        {id:"abst",label:"Assess: confirms he's abstinent (CO 4 ppm, action stage)",re:/abstin|smoke.?free|quit|non.?smok|4 ?ppm|\bco\b|action|confirm/i,ack:"Right, his CO of 4 confirms he's smoke-free.",
+          hints:["What does his CO of 4 ppm tell you?","Is he still smoking, or has he quit? Check the CO reference values in the Tobacco tab.","1–4 ppm is the normal range, even for non-smokers. What stage does that put him in?"]},
+        {id:"relapse",label:"Assist: relapse prevention (cravings, stress, triggers)",re:/relapse|crav|trigger|stress|cop/i,ack:"Yes, planning for stress and cravings is key.",
+          hints:["What's the biggest risk for him right now?","How would you help him handle cravings when the divorce gets hard?","A plan for stress and triggers would help prevent relapse."]},
+        {id:"meds",label:"Assist: continue varenicline, consider NRT for cravings",re:/varenicline|chantix|continue|12 ?weeks|nrt|gum|lozenge/i,ack:"Good, staying on his medicine is important.",
+          hints:["What about his current cessation medicine?","Should he keep taking varenicline? For how long?","Continuing varenicline (and maybe short-acting NRT for cravings) supports him now."]},
+        {id:"weight",label:"Addresses weight gain",re:/weight|diet|exercis|basketball/i,ack:"Nice that you picked up on the weight gain.",
+          hints:["Is there another side effect of quitting he's worried about?","He's gained 10 lbs. Would you address that?","Diet and exercise tips could help with the weight gain."]},
+        {id:"arrange",label:"Arrange: follow-up or quitline",re:/follow|quitline|800|check.?in|appointment/i,ack:"Good, regular check-ins will help.",
+          hints:["What would you arrange after today?","When should we see him again?","A follow-up in 1 to 2 weeks and the quitline would cover Arrange."]}
+      ],
+      pass:"That's a solid plan to keep him smoke-free.",
+      share:"Here's a complete plan. Ask: confirm he's still smoke-free. Advise: praise his quit and link it to his kids and his gums. Assess: CO 4 ppm is in the normal range, which confirms abstinence; he's in the action stage with high motivation (9/10) but high relapse risk from stress. Assist: keep taking varenicline for the full course (an extra 12 weeks can help prevent relapse), consider short-acting NRT for cravings, plan for stress and triggers, and give tips on weight gain. Arrange: follow-up in 1 to 2 weeks plus the quitline.",
+      perspective:"I'll keep reinforcing his quit at each dental visit. His gums will heal better without smoking, which is a nice motivator."
+    },
+    { text:"Write a brief joint summary plan for Brian's file.",
+      ask:"Let's wrap up. Can you write a brief joint summary plan for Brian's file, covering what pharmacy and dentistry will each do?",
+      must:["pharm","dent","tob"],
+      points:[
+        {id:"pharm",label:"Pharmacy's part (adherence, varenicline)",re:/varenicline|adher|remind|pharmac|nrt/i,ack:"",hints:["What will pharmacy do?","Include your adherence and varenicline plan.","Add pharmacy's part."]},
+        {id:"dent",label:"Dentistry's part (molar, periodontitis)",re:/molar|tooth|cavit|perio|root|restor|dent|scaling/i,ack:"",hints:["What will dentistry do?","Don't forget my part.","Add treating the molar and his periodontitis."]},
+        {id:"ref",label:"Referral for stress support",re:/refer|counsel|psych|social work/i,ack:"",hints:["Who else is on his team?","Add the stress support referral.","Include a social worker or psychologist."]},
+        {id:"tob",label:"Relapse prevention plan",re:/relapse|smoke.?free|quit|crav/i,ack:"",hints:["What's the plan to keep him smoke-free?","Summarize the tobacco plan.","Add relapse prevention."]},
+        {id:"follow",label:"Follow-up arranged",re:/follow|arrange|quitline|check.?in|next visit/i,ack:"",hints:["When will we see him again?","Add a follow-up.","Include a follow-up visit."]}
+      ],
+      pass:"Perfect, that's a clear plan for his chart.",
+      share:"Here's a joint plan we could file: Dentistry will treat the cavitated lower left first molar and start periodontal therapy. Pharmacy will set up adherence aids, keep him on varenicline for the full course and add short-acting NRT for cravings if needed. We'll refer him to a social worker or psychologist for divorce stress and follow up in 1 to 2 weeks.",
+      perspective:null
+    }
+  ]
+},
+margaret: {
+  tab:"Margaret", tag:"Practice", initials:"MG", mrn:"SIM-0400", age:"68 y.o. Female", draft:false, practice:true, pron:"her",
+  flags:[["Current smoker","warn"],["Ill-fitting dentures","warn"],["Weight loss","warn"],["Practice case","draft"]],
+  problems:["COPD","Depression","Dry mouth","Halitosis","Edentulous, ill-fitting dentures"],
+  tobacco:["10–15 menthol cigarettes/day","First cigarette within 30 min","Fagerström <b class='abn'>7</b> (moderate)","CO <b class='abn'>20 ppm</b>","Readiness 8/10"],
+  scenario:"Margaret is a 68-year-old retired schoolteacher who complains of dry mouth, difficulty swallowing and bad breath. She says that her present dentures are ill-fitted and they move when she eats and speaks. She is worried about recent weight loss and does not want lung cancer. She is trying to quit smoking but is struggling with cravings and notices that she smokes more when she is feeling lonely. Margaret says she is an \"8\" out of \"10\" for readiness to quit smoking. She remembers how good she felt the last time she quit smoking, but she does not have the same support she had in the past, explaining why she is not a \"10\".",
+  encounters:[["Today","Office Visit","Dental Clinic","Maya Chen, D2","Dry mouth, difficulty swallowing, bad breath, ill-fitting dentures"],["Today","IPE Consult","Pharmacy","You","Consult requested by dental"]],
+  info:[["Name","Margaret"],["Age","68-years-old"],["Gender","Female"],
+    ["Medical history",["Depression","COPD","Dry mouth","Halitosis"]],
+    ["Family history","Husband passed away and she has two children and 5 grandchildren."],
+    ["Social history",["Tobacco: started age 18 years; 10-15 menthol cigarettes/day. First cigarette within 30 minutes of waking. Fagerström score 7/10 (highly addictive), Triggers: after meals, with coffee, reading, gardening, before bed.","Quit smoking 2000-2002 with nicotine replacement gum 4 mg and 14 mg patches daily for 10 weeks. Relapsed after her husband died.","Denies alcohol or illicit drugs.","Diet: soft diet and convenient foods.","Living environment: She lives alone and has very few friends. Her children live in another state. She likes to garden and read.","Occupation: retired schoolteacher"]],
+    ["Dental history",["Edentulous","She has been edentulous in the maxillary arch (upper jaw) for the past 10 years and had her mandibular arch (lower jaw) anterior incisors extracted about 8 months ago."]],
+    ["Drug history",["Spiriva (tiotropium) 18 mcg 1 capsule for inhalation daily","Albuterol 90 mcg 2 inhalations PO q6h prn shortness of breath","Medicare insurance and supplemental covers all medications for tobacco dependence"]],
+    ["Physical exam",["Ht 160 cm Wt 62.5 kg BMI 24.4 BP 90/60 HR 100","Carbon Monoxide 20 ppm (<6 ppm non- smoker)","Renal and liver function within normal limits","Intraoral examination reveals moderately inflamed oral tissues, consistent with an ill-fitted denture; however, the amount of alveolar bone present is adequate for denture support"]]],
+  meds:[["Spiriva (tiotropium) 18 mcg","1 capsule for inhalation daily","COPD"],["Albuterol 90 mcg","2 inhalations PO q6h prn shortness of breath","COPD"],["Coverage","Medicare insurance and supplemental covers all medications for tobacco dependence",""]],
+  flow:[["Smoking status","Current, 10–15 menthol cigarettes/day (started at 18)",cpdRef(1)],
+    ["Time to first cigarette","Within 30 minutes of waking",ttfcRef(1)],
+    ["Fagerström score","<span class='abn'>7</span>",ftndRef(7)],
+    ["Exhaled CO","<span class='abn'>20 ppm</span>",coRef(20)],
+    ["Readiness to quit","8 / 10",READY],
+    ["Past quit attempts","Quit 2000–2002 with nicotine gum 4 mg and 14 mg patches daily for 10 weeks; relapsed after her husband died",""],
+    ["Triggers","After meals, with coffee, reading, gardening, before bed; smokes more when lonely",""]],
+  intro:"Hi! I'm Maya Chen, the D2 dental student on Margaret's team. She came in with dry mouth, trouble swallowing and bad breath, and her dentures move when she eats and talks. Her oral tissues are inflamed from the poor fit. She says she's an 8/10 on readiness to quit. Is there anything you noticed as a student pharmacist to assess her needs?",
+  reflectOn:"supporting an older adult who is ready to quit but has lost the support she had before",
+  qs:[
+    { text:"Is there anything you noticed as a student pharmacist to assess Margaret's needs?",
+      ask:null, must:["cause"], minMet:2,
+      points:[
+        {id:"cause",label:"Links dry mouth to her anticholinergic inhaler (Spiriva/tiotropium)",re:/anticholin|spiriva|tiotrop|(inhal|copd med|medicat)[^.]{0,60}(dry mouth|xerostom)|(dry mouth|xerostom)[^.]{0,60}(inhal|medicat|side effect)/i,ack:"Yes, her Spiriva could well be behind the dry mouth.",
+          hints:["Her dry mouth could have more than one cause. What's on her medication list?","One of her COPD inhalers belongs to a drug class known for drying the mouth. Which one?","Spiriva (tiotropium) is an anticholinergic. How could that relate to her dry mouth?"]},
+        {id:"spacer",label:"Suggests a spacer device or switching agents",re:/spacer|chamber|switch|alternative|change (her )?(inhaler|med)/i,ack:"A spacer or a different agent is a good option to raise with her prescriber.",
+          hints:["If her inhaler is the cause, what could you change?","Is there a device or a different medicine that could help?","A spacer device or switching agents may help. Would you suggest either?"]},
+        {id:"relief",label:"Dry mouth relief (e.g. Biotene rinse)",re:/biotene|saliva|rinse|sugar.?free|xylitol|water|moistur/i,ack:"That would help her comfort right away.",
+          hints:["What could make her more comfortable today?","Are there products that help with dry mouth?","A Biotene rinse may help. Would you recommend it?"]},
+        {id:"mood",label:"Keeps her depression and mood in mind",re:/depress|mood|lonel|monitor/i,ack:"Good to keep her mood in mind.",
+          hints:["Is there anything in her history that quitting could affect?","She has depression and feels lonely. Would you watch for anything?","Monitoring her mood would be wise as she quits."]}
+      ],
+      pass:"That's a really useful pharmacy view.",
+      share:"A complete pharmacy answer: her dry mouth may be due to her anticholinergic COPD inhaler (Spiriva/tiotropium). A spacer device or switching agents may help, and a Biotene rinse can relieve the dryness.",
+      perspective:"From the dental side, I'll explain that her ill-fitting dentures can be corrected, which will improve her speech and what she can eat. Her tissues are inflamed but there's enough bone to support a good denture. I'll also tell her that smoking speeds up periodontal destruction and is the reason for her bad breath.",
+      options:[
+        {t:"I'd recommend a saliva substitute for her dry mouth.",best:false,why:"It helps her comfort, but it only treats the symptom. Her Spiriva (an anticholinergic) is a likely cause, and a spacer or switching agents could fix it at the source."},
+        {t:"Her dry mouth may be caused by Spiriva (tiotropium), an anticholinergic for COPD. I'd suggest a spacer device or talk to her prescriber about switching agents, and recommend a Biotene rinse for relief.",best:true,why:"This is the strongest answer. It finds the likely cause in her medication list, offers a fix, and gives her relief now."},
+        {t:"Dry mouth is a dental issue, so I'd leave that to you and focus only on her smoking.",best:false,why:"This is a common mistake. Her dry mouth is likely from her COPD inhaler, so pharmacy owns the medication review here."}
+      ]
+    },
+    { text:"If you are the first health professional to encounter Margaret, which referrals or consultations would you make? Name your top 3 and explain why.",
+      ask:"Next one. If you were the first health professional to see Margaret, which referrals or consultations would you make? Name your top 3 and tell me why.",
+      must:["three","why"], minMet:4,
+      points:[
+        threeRefs("Margaret"),
+        {id:"dental",label:"Includes dental (refit dentures, inflamed tissue)",re:/dent|denture/i,ack:"Agreed, refitting her dentures will help her eat and speak.",
+          hints:["Why did she come in today?","Her dentures move when she eats and talks. Who handles that?","Is dentistry in your top 3?"]},
+        {id:"pharm",label:"Includes pharmacy (dry mouth from Spiriva, cessation medicines)",re:/pharmac/i,ack:"Yes, pharmacy can tackle her dry mouth and cessation medicines.",
+          hints:["Where does your own profession fit?","Who would review her inhaler and start cessation medicines?","Would you include pharmacy?"]},
+        {id:"support",label:"Includes a counselor or social worker (loneliness, lost support)",re:/counsel|social work|psycholog|therap|mental|lonel|support/i,ack:"Good, her loneliness is a big trigger.",
+          hints:["What makes her smoke more?","She's lonely and doesn't have the support she had last time. Who could help?","Would a counselor or social worker belong in your top 3?"]},
+        whyPoint("weight|lonel|ready|dry mouth|denture")
+      ],
+      pass:"I agree with those choices.",
+      share:"Possible referrals are dental, pharmacy, primary care, counselor, dietitian and social worker. A strong top 3 would be dental, pharmacy and a counselor or social worker, each with a reason.",
+      perspective:"Dental and pharmacy are clear for me: her dentures need refitting, and pharmacy can handle her dry mouth and cessation medicines. Her loneliness is a big trigger, so a counselor or social worker would help, and primary care or a dietitian could look at her weight loss.",
+      options:[
+        {t:"Top 3: pulmonology, a dietitian and primary care.",best:false,why:"Her COPD and weight loss matter, but she came in for her mouth and wants to quit, so leaving out dental and pharmacy misses her main needs today."},
+        {t:"Top 3: dental, pharmacy and primary care.",best:false,why:"Good picks, but there are no reasons. Explaining why is what shows your clinical thinking, and her loneliness, a key smoking trigger, isn't addressed."},
+        {t:"Top 3: dentistry, to refit her dentures and treat the inflamed tissue; pharmacy, to review her dry mouth from Spiriva and start cessation medicines while she's ready; and a counselor or social worker, because loneliness is a key trigger and she's lost the support she had last time.",best:true,why:"This is the strongest answer. Each referral targets a real need in her case, and every choice has a reason."}
+      ]
+    },
+    { text:"Based on Margaret's medical history, readiness to quit score and CO level, provide a smoking cessation treatment plan.",
+      ask:"She's an 8/10 on readiness, her CO is 20 ppm, her Fagerström score is 7 and she smokes within 30 minutes of waking. Using the 5 As, what's our smoking cessation treatment plan?",
+      must:["ready","depend","pharmaco"],
+      flag:{re:/5 ?rs|five rs|relevance|roadblock/i,unless:/nrt|patch|lozenge|varenicline|bupropion|inhaler/i,msg:"She's already an 8/10, so the 5 Rs (for people who aren't ready) might slow her down. What would help her quit now?"},
+      points:[
+        {id:"ready",label:"Assess: motivated to quit (8/10), help her set a quit date",re:/ready|motivat|8 ?\/ ?10|8 out of 10|quit date|within (the next )?(30|two|2)/i,ack:"Yes, at 8/10 she's ready, so let's help her pick a quit date.",
+          hints:["What does her 8/10 tell you about timing?","Is she ready to quit in the next month?","With 8/10, would you help her set a quit date?"]},
+        {id:"depend",label:"Assess: physical dependence (first cigarette within 30 min, CO 20, Fagerström 7)",re:/fagerstr|depend|\b7\b|\bco\b|20 ?ppm|carbon monoxide|30 min|wak/i,ack:"Right, smoking within 30 minutes of waking shows physical dependence.",
+          hints:["What do her time to first cigarette and CO tell you?","Check the Tobacco tab. Where do her Fagerström score and CO fall on the reference values?","Smoking within 30 minutes of waking, a Fagerström of 7 and CO of 20 ppm all point to real nicotine dependence."]},
+        {id:"pharmaco",label:"Assist: discusses pharmacotherapy options",re:/nrt|patch|lozenge|varenicline|chantix|bupropion|combination|medicat|pharmacotherap/i,ack:"Good, medicine will help with her cravings.",
+          hints:["What could help her with cravings and withdrawal?","She used NRT before. What options would you discuss now?","Pharmacotherapy options like the patch, lozenge or varenicline could help."]},
+        {id:"gum",label:"Avoids nicotine gum (no teeth, dentures)",re:/gum.{0,50}(denture|teeth|edentul)|(denture|teeth|edentul).{0,50}gum|avoid (nicotine )?gum|no gum|not gum/i,ack:"Nice catch: gum won't work with no teeth and loose dentures.",
+          hints:["She used gum last time. Would that still work?","Look at her dental history. Is any NRT form hard to use now?","With no upper teeth and ill-fitting dentures, would you avoid nicotine gum?"]},
+        {id:"bup",label:"Avoids bupropion (low appetite, weight loss)",re:/bupropion|zyban|wellbutrin/i,ack:"Good thinking on bupropion and her weight loss.",
+          hints:["Is there any cessation medicine that might be a poor fit for her?","She's worried about weight loss. Would any option make that worse?","Bupropion can reduce appetite. Would you avoid it for her?"]},
+        {id:"trigger",label:"Assist: trigger plan (5 Ds)",re:/5 ?d|five d|trigger|delay|deep breath|drink water|distract/i,ack:"A trigger plan will help with her meals, coffee and gardening.",
+          hints:["What situations make her want to smoke?","She smokes after meals, with coffee, reading and gardening. How would you plan for those?","The 5 Ds trigger plan is in the IPE Resources tab. Would you use it?"]},
+        {id:"advise",label:"Advise: link quitting to halitosis, taste, dry mouth and lung cancer",re:/halitosis|bad breath|taste|lung (cancer|function)|cancer|breath/i,ack:"Linking it to her bad breath and lungs makes the advice personal.",
+          hints:["How would you make your advice personal to her?","She may not know what's causing her bad breath. What would you tell her?","Quitting will improve her bad breath, taste, dry mouth and lung function, and lower her lung cancer risk."]},
+        {id:"arrange",label:"Arrange: specialist clinic or 1-800-QUIT-NOW",re:/follow|quitline|quit ?now|800|refer|clinic|specialist/i,ack:"Good, follow-up support is lined up.",
+          hints:["What would you arrange after today?","Who could support her between visits?","A specialist clinic or the quitline (1-800-QUIT-NOW) would cover Arrange."]}
+      ],
+      pass:"That's a strong plan for someone who's ready.",
+      share:"Here's a complete plan. Ask: we know her smoking habit. Advise: quitting will improve her bad breath, taste and dry mouth, her lung function, and lower her lung cancer risk. Assess: she's motivated (8/10); smoking within 30 minutes of waking shows physical dependence and CO 20 ppm is elevated. Assist: build a 5 Ds trigger plan, help her pick a quit date and discuss pharmacotherapy, avoiding nicotine gum (no teeth) and bupropion (low appetite). Arrange: a specialist clinic or 1-800-QUIT-NOW.",
+      perspective:"I'll get her dentures refit so she can eat and speak comfortably, and I'll remind her that quitting will help her bad breath and taste.",
+      options:[
+        {t:"Since she's not completely sure, I'd use the 5 Rs and hold off on medicines.",best:false,why:"This is a common mistake. She's 8/10 and motivated, so she's ready. The 5 Rs fit someone ambivalent like Lucy. Margaret needs a quit date and pharmacotherapy now."},
+        {t:"She's motivated (8/10), so let's help her set a quit date. Smoking within 30 minutes of waking and a CO of 20 ppm show physical dependence. I'd build a 5 Ds trigger plan for meals, coffee, reading and gardening, and discuss pharmacotherapy, avoiding nicotine gum since she has no teeth and avoiding bupropion given her low appetite. Then I'd refer her to a cessation clinic or 1-800-QUIT-NOW.",best:true,why:"This is the strongest answer. It follows all 5 As, uses her numbers, and picks options that fit her teeth and appetite."},
+        {t:"She quit before with the gum and the patch, so I'd restart the same: 4 mg gum and 14 mg patches.",best:false,why:"Building on what worked is smart, but gum isn't an option now that she has no teeth and loose dentures. There's also no quit date, trigger plan or follow-up."}
+      ]
+    },
+    { text:"Write a brief joint summary plan for Margaret's file.",
+      ask:"Let's wrap up. Can you write a brief joint summary plan for Margaret's file, covering what pharmacy and dentistry will each do?",
+      must:["pharm","dent","tob"],
+      points:[
+        {id:"pharm",label:"Pharmacy's part (dry mouth review, cessation medicines)",re:/nrt|patch|lozenge|varenicline|spiriva|tiotrop|anticholin|dry mouth|spacer|biotene|medicat|pharmac/i,ack:"",hints:["What will pharmacy do?","Include the dry mouth review and cessation medicines.","Add pharmacy's part."]},
+        {id:"dent",label:"Dentistry's part (refit dentures, halitosis)",re:/denture|refit|reline|dent|halitosis|perio/i,ack:"",hints:["What will dentistry do?","Don't forget my part.","Add refitting her dentures."]},
+        {id:"support",label:"Support for loneliness or mood",re:/lonel|counsel|social work|support|depress|mood/i,ack:"",hints:["What about her loneliness?","Add support for her mood or loneliness.","Include a counselor or social worker."]},
+        {id:"tob",label:"Quit plan with a quit date",re:/quit date|quit|cessation|5 ?d|trigger/i,ack:"",hints:["What's the plan for her smoking?","Summarize the quit plan.","Add the quit date and trigger plan."]},
+        {id:"follow",label:"Follow-up arranged",re:/follow|arrange|quitline|800|clinic|check.?in|next visit/i,ack:"",hints:["When will we see her again?","Add a follow-up.","Include the quitline or a clinic referral."]}
+      ],
+      pass:"Perfect, that's a clear plan for her chart.",
+      share:"Dentistry will refit her dentures and explain how smoking causes her bad breath. Pharmacy will review Spiriva as a likely cause of her dry mouth, help her set a quit date, build a 5 Ds trigger plan and start pharmacotherapy without gum or bupropion. We'll refer her to a counselor or social worker for support and arrange a cessation clinic or the quitline.",
+      perspective:null,
+      options:[
+        {t:"Pharmacy handles smoking, dentistry handles dentures.",best:false,why:"Right roles, but too thin for the chart: no specific actions, no follow-up and nothing about her loneliness."},
+        {t:"Plan: restart the gum and patch and follow up.",best:false,why:"This only covers pharmacy's part, and gum won't work with her teeth. A joint plan needs both professions and how you'll coordinate."},
+        {t:"Dentistry will refit her dentures, treat the inflamed tissue and explain how smoking causes her bad breath. Pharmacy will review Spiriva as a likely cause of her dry mouth (spacer, switching agents, Biotene), help her set a quit date, build a 5 Ds trigger plan and start pharmacotherapy without gum or bupropion. We'll refer her to a counselor or social worker for support and arrange a cessation clinic or 1-800-QUIT-NOW.",best:true,why:"This is the strongest answer. Both professions have clear actions, her loneliness is addressed, and follow-up is arranged."}
+      ]
+    }
+  ]
+}
+};
+
+/* =====================================================================
+   IPE RESOURCES (5 As, 5 Rs, 5 Ds, Fagerström, exhaled CO)
+   5 As adapted from the Rx for Change Tobacco Cessation Counseling
+   Guidesheet (5_As_handout1.pdf) and Fiore MC et al., 2008 guideline.
+   ===================================================================== */
+const FOOTNOTES = `<sup>1</sup> Fagerström Test for Nicotine Dependence: <a href="${LINKS.ftnd}" target="_blank" rel="noopener">aarc.org/…/Fagerstrom_test.pdf</a><br>
+  <sup>2</sup> Exhaled carbon monoxide test: <a href="${LINKS.co}" target="_blank" rel="noopener">asthmaandlung.org.uk/…/exhaled-carbon-monoxide</a><br>
+  Full scoring guides are in the IPE Resources tab.`;
+
+const RESOURCES_HTML = `
+<div class="panel"><div class="ph">The 5 As of tobacco cessation <span>Counseling guide</span></div>
+<table class="grid res"><thead><tr><th>Step</th><th>What to do</th><th>Suggested wording</th></tr></thead><tbody>
+<tr><td><b>1. Ask</b><br><span class="sub">about tobacco use</span></td><td>Ask every patient about tobacco use. Take a history: type and amount, time to first cigarette, how long they've used, recent changes, past quit attempts, what did or didn't work, past medicines (dose, adherence, duration) and reasons for relapse.</td><td>"Do you ever smoke or use other types of tobacco or nicotine, such as e-cigarettes?"<br>"I take time to talk with all of my patients about tobacco use, because it's important."</td></tr>
+<tr><td><b>2. Advise</b><br><span class="sub">to quit</span></td><td>Give clear, strong and personal advice to quit. Ask permission first, then link the advice to the patient's own health concerns.</td><td>"May I tell you why this concerns me?"<br>"Quitting is the most important thing you can do to protect your health now and in the future."</td></tr>
+<tr><td><b>3. Assess</b><br><span class="sub">readiness to quit</span></td><td>Find out whether the patient is ready to quit in the next month.<ul class="tight"><li><b>Uses tobacco and ready:</b> go on to Assist and Arrange.</li><li><b>Uses tobacco, not ready:</b> enhance motivation with the 5 Rs.</li><li><b>Used tobacco before, not now:</b> prevent relapse.</li><li><b>Never used:</b> encourage continued abstinence.</li></ul></td><td>"What are your thoughts about quitting? Might you consider quitting sometime in the next month?"</td></tr>
+<tr><td><b>4. Assist</b><br><span class="sub">with quitting</span></td><td>Discuss reasons for quitting, confidence, triggers, routines, stress, and worries about weight gain or withdrawal. Then:<ul class="tight"><li>Set a quit date, ideally less than 2 weeks away</li><li>Recommend a tobacco use log</li><li>Discuss coping strategies (cognitive and behavioral)</li><li>Discuss withdrawal symptoms, and a "slip" versus a relapse</li><li>Counsel on medicines: adherence and proper use, with a demonstration</li></ul></td><td>"Let's pick a quit date in the next two weeks and plan for your toughest moments."</td></tr>
+<tr><td><b>5. Arrange</b><br><span class="sub">follow-up</span></td><td>Follow up in the first week after the quit date, and again within the first month. Use face-to-face, phone or email contacts. Address triggers, congratulate success and reinforce support. Refer to a cessation clinic or the quitline (1-800-QUIT-NOW).</td><td>"I'll check in with you the week after your quit date to see how it's going."</td></tr>
+</tbody></table>
+<div class="foot">Adapted from the Rx for Change Tobacco Cessation Counseling Guidesheet (© The Regents of the University of California) and Fiore MC, Jaén CR, Baker TB, et al. <i>Treating Tobacco Use and Dependence: 2008 Update.</i> U.S. Department of Health and Human Services, 2008.</div></div>
+
+<div class="panel"><div class="ph">The 5 Rs <span>For patients not ready to quit yet</span></div>
+<table class="grid res"><thead><tr><th>R</th><th>What it means</th><th>Example question</th></tr></thead><tbody>
+<tr><td><b>Relevance</b></td><td>Why quitting matters to this patient personally (health, family, money, goals).</td><td>"How does smoking fit with what matters most to you right now?"</td></tr>
+<tr><td><b>Risks</b></td><td>The patient names the negative effects of smoking: short-term, long-term and on others.</td><td>"What worries you most about continuing to smoke?"</td></tr>
+<tr><td><b>Rewards</b></td><td>The patient names the benefits of quitting, such as better breath, taste, health and savings.</td><td>"What would be better for you if you quit?"</td></tr>
+<tr><td><b>Roadblocks</b></td><td>Barriers to quitting (withdrawal, stress, other smokers, weight gain) and how to get around them.</td><td>"What would make quitting hard for you?"</td></tr>
+<tr><td><b>Repetition</b></td><td>Revisit motivation at every visit. Remind them most people try several times before they quit for good.</td><td>"Can we talk about this again next time?"</td></tr>
+</tbody></table></div>
+
+<div class="panel"><div class="ph">The 5 Ds <span>Trigger plan for cravings</span></div>
+<table class="grid res"><tbody>
+<tr><td><b>Delay</b></td><td>Wait it out. Most cravings pass in a few minutes.</td></tr>
+<tr><td><b>Deep breathing</b></td><td>Take slow, deep breaths until the urge eases.</td></tr>
+<tr><td><b>Drink water</b></td><td>Sip water slowly.</td></tr>
+<tr><td><b>Do something else</b></td><td>Change the routine or keep hands and mind busy.</td></tr>
+<tr><td><b>Discuss</b></td><td>Talk to a friend, family member or the quitline.</td></tr>
+</tbody></table></div>
+
+<div class="panel"><div class="ph">Fagerström Test for Nicotine Dependence <span><a href="${LINKS.ftnd}" target="_blank" rel="noopener">Source (AARC)</a></span></div>
+<table class="grid res"><thead><tr><th>Question</th><th>Answer and points</th></tr></thead><tbody>
+<tr><td>How soon after waking do you smoke your first cigarette?</td><td>Within 5 minutes = 3 · 5–30 minutes = 2 · 31–60 minutes = 1</td></tr>
+<tr><td>Do you find it difficult to refrain from smoking in places where it is forbidden (e.g. church, library)?</td><td>Yes = 1 · No = 0</td></tr>
+<tr><td>Which cigarette would you hate to give up?</td><td>The first in the morning = 1 · Any other = 0</td></tr>
+<tr><td>How many cigarettes a day do you smoke?</td><td>10 or less = 0 · 11–20 = 1 · 21–30 = 2 · 31 or more = 3</td></tr>
+<tr><td>Do you smoke more frequently in the morning?</td><td>Yes = 1 · No = 0</td></tr>
+<tr><td>Do you smoke even if you are sick in bed most of the day?</td><td>Yes = 1 · No = 0</td></tr>
+<tr><td><b>Total score</b></td><td><b>1–2</b> low dependence · <b>3–4</b> low to moderate · <b>5–7</b> moderate · <b>8+</b> high dependence</td></tr>
+</tbody></table></div>
+
+<div class="panel"><div class="ph">Exhaled carbon monoxide (CO) <span><a href="${LINKS.co}" target="_blank" rel="noopener">Source (Asthma + Lung UK)</a></span></div>
+<table class="grid res"><thead><tr><th>Reading</th><th>What it means</th></tr></thead><tbody>
+<tr><td><b>10 ppm and over</b></td><td>Recent exposure to a high level of carbon monoxide. This is common if you smoke.</td></tr>
+<tr><td><b>5–9 ppm</b></td><td>Recent exposure to a mild level. This may mean the person smokes or has been exposed to second-hand smoke.</td></tr>
+<tr><td><b>1–4 ppm</b></td><td>Recent exposure to a low level. A small amount of CO in the breath is normal, even in non-smokers.</td></tr>
+</tbody></table>
+<div class="foot">The case sheets use &lt;6 ppm as the non-smoker cut-off.</div></div>`;
+
+const REFLECT = (name) => [
+  `How did you choose your top 3 referrals, and did the dental student's perspective shift your initial thoughts?`,
+  `Where could your communication or therapeutic reasoning regarding ${name}'s nicotine dependence have been strengthened?`,
+  `How does this simulated chat mirror real-world professional team-based challenges?`
+];
+
+/* =====================================================================
+   STATE
+   ===================================================================== */
+const S = {};
+let cur = CONFIG.startCase;
+let view = "chart";
+let busy = false;
+
+function st(id){
+  if(!S[id]){
+    const n = CASES[id].qs.length;
+    const el = document.createElement("div"); el.className = "thread"; el.dataset.case = id;
+    S[id] = {started:false, ended:false, q:0, tries:Array(n).fill(0), hint:Array(n).fill(0),
+             met:Array.from({length:n},()=>({})), via:Array(n).fill(null), closed:Array(n).fill(false),
+             awaiting:false, picked:Array(n).fill(null), log:[], el, guideShown:false, rubricShown:false,
+             hintsUsed:0, qtext:Array(n).fill("")};
+  }
+  return S[id];
+}
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+const now = () => new Date().toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
+function toast(t){ const d=document.createElement("div"); d.className="toast"; d.textContent=t; document.body.appendChild(d); setTimeout(()=>d.remove(),1800); }
+function scrollChat(){ const m=$("msgs"); m.scrollTop = m.scrollHeight; }
+
+function push(id, msg){
+  const s = st(id); msg.time = msg.time || now(); s.log.push(msg);
+  let el;
+  if(msg.type==="sys"){ el=document.createElement("div"); el.className="sys"; el.textContent=msg.text; }
+  else if(msg.type==="div"){ el=document.createElement("div"); el.className="div"; el.id=`${id}-div-${msg.q}`; el.textContent=msg.text; }
+  else if(msg.type==="card"){ el=document.createElement("div"); el.className="card"; el.innerHTML=msg.html; }
+  else {
+    el=document.createElement("div");
+    const cls = msg.type==="me" ? "me" : msg.type==="hint" ? "hint" : msg.type==="share" ? "share" : "";
+    el.className = "m " + cls;
+    const who = msg.type==="me" ? "You" : msg.type==="hint" ? `Hint from ${CONFIG.botName.split(" ")[0]}` : msg.type==="share" ? `${CONFIG.botName.split(" ")[0]} shares a complete answer` : CONFIG.botName;
+    el.innerHTML = `<div class="who">${who} · ${msg.time}</div>${esc(msg.text)}`;
+  }
+  s.el.appendChild(el);
+  if(id===cur) scrollChat();
+  return el;
+}
+
+async function maya(id, items){
+  busy = true; syncCompose();
+  for(const it of items){
+    const t = document.createElement("div"); t.className="typing"; t.textContent=`${CONFIG.botName.split(" ")[0]} is typing…`;
+    st(id).el.appendChild(t); if(id===cur) scrollChat();
+    await sleep(Math.min(1400, 450 + (it.text ? it.text.length*4 : 300)));
+    t.remove();
+    push(id, typeof it==="string" ? {type:"maya", text:it} : it);
+  }
+  busy = false; syncCompose();
+}
+
+/* =====================================================================
+   RUBRIC
+   ===================================================================== */
+function qStatus(id, qi){
+  const s=st(id), Q=CASES[id].qs[qi];
+  if(!s.started || (qi>s.q && !s.closed[qi])) return "none";
+  const met = s.met[qi], cnt = Object.keys(met).length;
+  const mustOk = Q.must.every(k=>met[k]) && (!Q.minMet || cnt>=Q.minMet);
+  if(mustOk) return "met";
+  if(cnt>0) return "partly";
+  return s.closed[qi] || qi<s.q ? "not" : "none";
+}
+const PILL = {met:["met","Met"], partly:["partly","Partly met"], not:["not","Not yet"], none:["none","Not reached"]};
+const VIA = {own:"In your own words", shared:"Maya shared the full answer", sample:"Compared with sample answers"};
+
+function rubricTable(id){
+  const C=CASES[id], s=st(id);
+  let rows = C.qs.map((Q,i)=>{
+    const p = PILL[qStatus(id,i)];
+    const pts = Q.points.map(pt=>`<span class="pt ${s.met[i][pt.id]?"y":"n"}">${s.met[i][pt.id]?"✓":"○"} ${esc(pt.label)}${Q.must.includes(pt.id)?" *":""}</span>`).join("");
+    let how = s.via[i] ? VIA[s.via[i]] : "";
+    if(s.picked[i]!=null){ const o=Q.options[s.picked[i]]; how += how?" · ":""; how += o.best ? "Picked the strongest sample" : "Picked a weaker sample"; }
+    return `<tr><td><b>${STEPS[i].k}</b><br><span style="color:var(--e-sub)">${STEPS[i].label}</span></td><td><span class="pill ${p[0]}">${p[1]}</span></td><td><div class="pts">${pts}</div></td><td style="color:var(--e-sub)">${how||"–"}</td></tr>`;
+  }).join("");
+  return `<table class="grid"><thead><tr><th>Question</th><th>Result</th><th>Rubric points (* = key point)</th><th>How</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function feedbackText(id){
+  const C=CASES[id], s=st(id);
+  const statuses = C.qs.map((_,i)=>qStatus(id,i));
+  const strong = statuses.filter(x=>x==="met").length>=3;
+  const did=[], miss=[];
+  const extra=[];
+  C.qs.forEach((Q,i)=>Q.points.forEach(pt=>{ if(s.met[i][pt.id]) did.push(pt.label); else if(Q.must.includes(pt.id)) miss.push(pt.label); else extra.push(pt.label); }));
+  miss.push(...extra);
+  const lc = (t)=>t.charAt(0).toLowerCase()+t.slice(1);
+  const didTxt = did.length ? did.slice(0,3).map(lc).join("; ") : "the start of the conversation";
+  const missTxt = miss.length ? lc(miss[0]) : "adding even more case-specific detail, such as exact scores and follow-up timing";
+  return `Your clinical justification demonstrated a ${strong?"strong":"developing"} understanding of interprofessional collaboration. You addressed ${didTxt}. To improve, consider focusing more on ${missTxt}. Reflect on how this case mirrors the real-world challenge of ${C.reflectOn}.`;
+}
+
+/* =====================================================================
+   PRACTICE ENGINE (stand-in for Claude)
+   ===================================================================== */
+function pointHit(p, text){
+  if(p.count) return p.count.filter(r=>r.test(text)).length >= p.min;
+  return p.re.test(text);
+}
+function firstMissing(id, qi){
+  const Q=CASES[id].qs[qi], met=st(id).met[qi];
+  return Q.points.find(p=>Q.must.includes(p.id) && !met[p.id]) || Q.points.find(p=>!met[p.id]);
+}
+
+async function practiceTurn(id, text){
+  const C=CASES[id], s=st(id), qi=s.q, Q=C.qs[qi];
+  s.tries[qi]++;
+  const newly=[];
+  s.qtext[qi] += " " + text;
+  Q.points.forEach(p=>{ if(!s.met[qi][p.id] && pointHit(p, s.qtext[qi])){ s.met[qi][p.id]=true; newly.push(p); } });
+  const flagged = Q.flag && Q.flag.re.test(text) && !(Q.flag.unless && Q.flag.unless.test(text));
+  const cnt=Object.keys(s.met[qi]).length;
+  const pass = Q.must.every(k=>s.met[qi][k]) && (!Q.minMet || cnt>=Q.minMet);
+  const acks = newly.map(p=>p.ack).filter(Boolean).slice(0,2).join(" ");
+
+  if(pass){
+    await maya(id,[ [acks, Q.pass].filter(Boolean).join(" ") ]);
+    return closeQuestion(id, "own");
+  }
+  if(s.tries[qi] >= CONFIG.maxTries){
+    const lead = [acks, flagged?Q.flag.msg:""].filter(Boolean).join(" ");
+    if(C.practice){
+      await maya(id,[ (lead?lead+" ":"") + "Let's compare with some sample answers so you can see what a complete response looks like." ]);
+      return showOptions(id, false);
+    }
+    await maya(id,[ (lead?lead+" ":"") + "Thanks for working through that with me. Let me share what I'd want to see.", {type:"share", text:Q.share} ]);
+    return closeQuestion(id, "shared");
+  }
+  let reply;
+  if(flagged) reply = (acks?acks+" ":"") + Q.flag.msg;
+  else {
+    const miss = firstMissing(id, qi);
+    const lvl = Math.min(2, Math.max(s.tries[qi]-1, s.hint[qi]));
+    s.hint[qi] = Math.max(s.hint[qi], lvl+1);
+    const lead = acks || "Hmm, I'm not sure that gets at it yet.";
+    reply = `${lead} ${miss.hints[lvl]}`;
+  }
+  await maya(id,[reply]);
+}
+
+/* Live Claude engine: used only when CONFIG.engine === "claude".
+   The server function adds the system prompt (Maya, case, rubric) and the API key,
+   then returns JSON: {maya_reply, rubric:[{point,result}], accuracy, hint_level, advance}. */
+async function claudeTurn(id, text){
+  const s=st(id);
+  try{
+    const r = await fetch(CONFIG.apiUrl,{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({caseId:id, question:s.q, tries:s.tries[s.q], history:s.log.filter(m=>m.type==="me"||m.type==="maya").slice(-12).map(m=>({role:m.type==="me"?"user":"assistant",content:m.text})), message:text})});
+    const j = await r.json();
+    s.tries[s.q]++;
+    (j.rubric||[]).forEach(p=>{ if(p.result==="met") s.met[s.q][p.point]=true; });
+    await maya(id,[j.maya_reply]);
+    if(j.advance) return closeQuestion(id, "own");
+    if(s.tries[s.q]>=CONFIG.maxTries){ if(CASES[id].practice) return showOptions(id,false); await maya(id,[{type:"share",text:CASES[id].qs[s.q].share}]); return closeQuestion(id,"shared"); }
+  }catch(e){
+    push(id,{type:"sys",text:"Couldn't reach Maya. Switching to the practice engine."});
+    CONFIG.engine="practice"; $("engine-badge").textContent="Practice engine · no AI";
+    return practiceTurn(id,text);
+  }
+}
+
+/* =====================================================================
+   FLOW
+   ===================================================================== */
+function guideHtml(withStart){
+  return `<h4>How this works</h4>
+  <ol class="guide">
+    <li><span><b>Read the chart.</b> The left column and the chart tabs have everything about the patient.</span></li>
+    <li><span><b>Start the simulation.</b> Maya, a D2 dental student, will message you about your shared patient.</span></li>
+    <li><span><b>Answer 4 questions in your own words:</b> Q1 Scope of practice, Q2 Referrals, Q3 Treatment plan, Q4 Joint plan. The timeline above shows where you are.</span></li>
+    <li><span><b>Stuck? Ask Maya for a hint.</b> You have ${CONFIG.maxHints} hints per case. They're free and don't affect your result. The IPE Resources tab has the 5 As, 5 Rs and score guides.</span></li>
+    <li><span><b>Up to ${CONFIG.maxTries} tries per question.</b> If something's missing after that, Maya shows you what a complete answer looks like${CASES[cur].practice?" (in this practice case you'll compare sample answers)":""}.</span></li>
+    <li><span><b>See your results and copy your chat.</b> Rubric results appear after the joint plan. Click End Simulation for feedback, then copy your chat into your assignment.</span></li>
+  </ol>
+  ${withStart?`<div class="row"><button class="btn pri" type="button" data-start>Start Simulation</button></div>`:""}`;
+}
+
+async function startSim(id){
+  const s=st(id); if(s.started) return;
+  s.started=true;
+  [...s.el.querySelectorAll("[data-start]")].forEach(b=>b.disabled=true);
+  push(id,{type:"sys",text:`Simulation started ${now()}`});
+  push(id,{type:"div",q:0,text:`Q1 · ${STEPS[0].label}`});
+  renderAll();
+  await maya(id,[CASES[id].intro]);
+  $("input").focus();
+}
+
+async function closeQuestion(id, via){
+  const s=st(id), C=CASES[id], qi=s.q, Q=C.qs[qi];
+  s.via[qi]=via; s.closed[qi]=true;
+  if(C.practice && via==="own"){ return showOptions(id, true); }
+  await afterQuestion(id);
+}
+
+async function afterQuestion(id){
+  const s=st(id), C=CASES[id], qi=s.q, Q=C.qs[qi];
+  if(Q.perspective) await maya(id,[Q.perspective]);
+  if(qi < C.qs.length-1){
+    s.q++;
+    push(id,{type:"div",q:s.q,text:`${STEPS[s.q].k} · ${STEPS[s.q].label}`});
+    renderAll();
+    await maya(id,[C.qs[s.q].ask]);
+  } else {
+    s.q = C.qs.length; // all questions done
+    showRubricCard(id);
+    renderAll();
+  }
+}
+
+function showRubricCard(id){
+  const s=st(id); if(s.rubricShown) return; s.rubricShown=true;
+  const C=CASES[id], s2=st(id);
+  const rows = C.qs.map((Q,i)=>{ const p=PILL[qStatus(id,i)], got=Q.points.filter(pt=>s2.met[i][pt.id]).length;
+    return `<tr><td><b>${STEPS[i].k}</b> ${STEPS[i].label}</td><td><span class="pill ${p[0]}">${p[1]}</span></td><td style="color:var(--e-sub)">${got} of ${Q.points.length} points</td></tr>`; }).join("");
+  const html = `<h4>Your rubric results</h4><table class="grid"><tbody>${rows}</tbody></table>
+    <p style="color:var(--e-sub)">The point-by-point breakdown is in the Feedback tab after you end the simulation.</p>
+    <p>When you're ready, click <b>End Simulation</b> for your feedback and to copy your chat.</p>`;
+  push(id,{type:"card",html,text:"[Rubric results shown]"});
+}
+
+function showOptions(id, optional){
+  const s=st(id), Q=CASES[id].qs[s.q];
+  s.awaiting=true; syncCompose();
+  const qi=s.q;
+  const opts = Q.options.map((o,i)=>`<button type="button" class="opt" data-opt="${i}" data-q="${qi}"><b>${i+1}</b><span>${esc(o.t)}</span></button>`).join("");
+  const html = `<h4>${optional?"Nice work. Want to compare with sample answers?":"Compare with sample answers"}</h4>
+    <p style="color:var(--e-sub)">Which response would you send to Maya? Pick one to see her take.</p>
+    <div style="display:grid;gap:6px">${opts}</div>
+    ${optional?`<div class="row"><button class="btn" type="button" data-skip="${qi}">Skip and move on</button></div>`:""}`;
+  if(!s.via[qi]) { s.via[qi]="sample"; s.closed[qi]=true; }
+  push(id,{type:"card",html,text:"[Sample answers shown]"});
+  renderAll();
+}
+
+async function pickOption(id, qi, i){
+  const s=st(id), Q=CASES[id].qs[qi], o=Q.options[i];
+  if(!s.awaiting || s.q!==qi) return;
+  s.awaiting=false; s.picked[qi]=i;
+  s.el.querySelectorAll(`[data-q="${qi}"]`).forEach(b=>{ b.disabled=true; if(+b.dataset.opt===i) b.classList.add("picked"); });
+  const sk=s.el.querySelector(`[data-skip="${qi}"]`); if(sk) sk.disabled=true;
+  push(id,{type:"me",text:`I'd send option ${i+1}: "${o.t}"`});
+  const bestIdx = Q.options.findIndex(x=>x.best);
+  const msgs=[o.why];
+  if(!o.best) msgs.push(`The strongest one is option ${bestIdx+1}. ${Q.options[bestIdx].why.replace(/^This is the strongest answer\. /,"")}`);
+  await maya(id,msgs);
+  await afterQuestion(id);
+}
+
+async function skipOptions(id, qi){
+  const s=st(id); if(!s.awaiting || s.q!==qi) return;
+  s.awaiting=false;
+  s.el.querySelectorAll(`[data-q="${qi}"],[data-skip="${qi}"]`).forEach(b=>b.disabled=true);
+  await afterQuestion(id);
+}
+
+async function giveHint(){
+  const id=cur, s=st(id);
+  if(!s.started){ toast("Start the simulation first"); return; }
+  if(s.ended){ toast("The simulation has ended"); return; }
+  if(s.awaiting){ toast("Pick a sample answer above, or skip"); return; }
+  if(s.q>=CASES[id].qs.length){ toast("All questions are done. Click End Simulation for feedback"); return; }
+  if(busy) return;
+  if(s.hintsUsed >= CONFIG.maxHints){ toast(`You've used all ${CONFIG.maxHints} hints for this case`); return; }
+  const miss = firstMissing(id, s.q);
+  if(!miss){ toast("You've covered everything for this question"); return; }
+  const lvl = Math.min(2, Math.max(s.hint[s.q], s.tries[s.q]));
+  s.hint[s.q] = lvl+1;
+  s.hintsUsed++;
+  syncCompose();
+  await maya(id,[{type:"hint", text:miss.hints[lvl]}]);
+}
+
+function endSim(id){
+  const s=st(id); if(s.ended) return;
+  if(!s.started){ toast("Start the simulation first"); return; }
+  s.ended=true; s.awaiting=false;
+  s.el.querySelectorAll(".opt,[data-skip]").forEach(b=>b.disabled=true);
+  if(s.q<CASES[id].qs.length && s.tries[s.q]>0) s.closed[s.q]=true;
+  push(id,{type:"sys",text:`Simulation ended ${now()}`});
+  const fb = feedbackText(id);
+  push(id,{type:"card",text:"Feedback: "+fb,html:`<h4>Feedback</h4><p>${esc(fb)}</p><div class="row"><button class="btn pri" type="button" data-copy>Copy chat and feedback</button><button class="btn" type="button" data-view-fb>See full results</button></div>`});
+  view="feedback";
+  renderAll();
+}
+
+async function send(){
+  const id=cur, s=st(id), box=$("input"), text=box.value.trim();
+  if(!text || busy) return;
+  if(/^start simulation$/i.test(text)){ box.value=""; return startSim(id); }
+  if(/^end simulation$/i.test(text)){ box.value=""; return endSim(id); }
+  if(!s.started){ toast("Click Start Simulation first"); return; }
+  if(s.ended){ toast("The simulation has ended"); return; }
+  if(s.awaiting){ toast("Pick a sample answer above, or skip"); return; }
+  box.value="";
+  push(id,{type:"me",text});
+  if(s.q>=CASES[id].qs.length){ await maya(id,["Thanks! Whenever you're ready, click End Simulation and I'll give you feedback."]); return; }
+  renderAll();
+  if(CONFIG.engine==="claude") await claudeTurn(id,text); else await practiceTurn(id,text);
+  renderAll();
+}
+
+/* =====================================================================
+   TRANSCRIPT + COPY
+   ===================================================================== */
+function transcript(id){
+  const C=CASES[id], s=st(id);
+  const lines=[`IPE Simulation: ${C.tab} (${C.tag})`, `Collaborator: ${CONFIG.botName}, ${CONFIG.botRole}`, `Date: ${new Date().toLocaleDateString()}`, ""];
+  s.log.forEach(m=>{
+    if(m.type==="div") lines.push("", `--- ${m.text} ---`);
+    else if(m.type==="sys") lines.push(`(${m.text})`);
+    else if(m.type==="me") lines.push(`[${m.time}] You: ${m.text}`);
+    else if(m.type==="hint") lines.push(`[${m.time}] ${CONFIG.botName} (hint): ${m.text}`);
+    else if(m.type==="share") lines.push(`[${m.time}] ${CONFIG.botName} (complete answer): ${m.text}`);
+    else if(m.type==="maya") lines.push(`[${m.time}] ${CONFIG.botName}: ${m.text}`);
+  });
+  lines.push("", "--- Rubric results ---");
+  C.qs.forEach((Q,i)=>{ lines.push(`${STEPS[i].k} ${STEPS[i].label}: ${PILL[qStatus(id,i)][1]}`); });
+  if(s.ended){ lines.push("", "--- Feedback ---", feedbackText(id)); }
+  lines.push("", "--- Reflection questions ---");
+  REFLECT(C.tab).forEach((q,i)=>lines.push(`${i+1}. ${q}`, ""));
+  return lines.join("\n");
+}
+
+function copyTranscript(){
+  const text = transcript(cur);
+  const fallback = () => {
+    view="feedback"; renderAll();
+    const ta=$("transcript"); if(ta){ ta.focus(); ta.select(); }
+    toast("Text selected. Press Ctrl+C (or Cmd+C) to copy");
+  };
+  try{
+    navigator.clipboard.writeText(text).then(()=>toast("Copied. Paste it into your assignment"), fallback);
+  }catch(e){ fallback(); }
+}
+
+/* =====================================================================
+   RENDER
+   ===================================================================== */
+function renderTabs(){
+  $("ptabs").innerHTML = CONFIG.caseOrder.map(id=>{
+    const C=CASES[id];
+    return `<button type="button" role="tab" class="ptab ${id===cur?"on":""}" aria-selected="${id===cur}" data-case="${id}">${C.tab} <small>${C.tag}</small></button>`;
+  }).join("");
+}
+
+function renderStory(){
+  const C=CASES[cur];
+  $("story").innerHTML = `
+    <div class="photo">${C.initials}</div>
+    <div><div class="pname">${C.tab}</div><div class="pmeta">${C.age} · MRN ${C.mrn}</div></div>
+    <div class="sb"><span class="sbl">Allergies</span><span class="allergy">Not listed in case</span></div>
+    <div class="sb"><span class="sbl">Flags</span><div>${C.flags.map(f=>`<span class="flag ${f[1]}">${f[0]}</span>`).join("")}</div></div>
+    <div class="sb"><span class="sbl">Problems</span>${C.problems.map(p=>`<span>${p}</span>`).join("")}</div>
+    <div class="sb"><span class="sbl">Tobacco</span>${C.tobacco.map(p=>`<span>${p}</span>`).join("")}</div>
+    <div class="sb"><span class="sbl">Care team</span><span>${CONFIG.botName}, D2</span><span>You, PharmD student</span></div>`;
+}
+
+function bannerHtml(){
+  const C=CASES[cur], s=st(cur);
+  let title, q, btns="";
+  if(!s.started){ title="Simulation not started"; q=`Read ${C.tab}'s chart, then click Start Simulation in the chat.`; btns=`<button class="btn pri" type="button" data-start>Start Simulation</button><button class="btn" type="button" data-guide>How it works</button>`; }
+  else if(s.ended){ title="Simulation ended"; q="Your feedback and rubric results are ready. Copy your chat for your assignment reflection."; btns=`<button class="btn pri" type="button" data-copy>Copy chat and feedback</button>`; }
+  else if(s.q>=C.qs.length){ title="All 4 questions done"; q="Review your rubric results in the chat, then click End Simulation for feedback."; btns=`<button class="btn pri" type="button" data-end>End Simulation</button>`; }
+  else { title=`IPE question ${s.q+1} of ${C.qs.length} · ${STEPS[s.q].label}`; q=C.qs[s.q].text; btns=`<button class="btn hint" type="button" data-hint>Ask Maya for a hint (${Math.max(0,CONFIG.maxHints-s.hintsUsed)} left)</button><span style="font-size:11.5px;color:var(--e-sub)">Try ${Math.min(s.tries[s.q]+1,CONFIG.maxTries)} of ${CONFIG.maxTries}</span>`; }
+  return `<div class="bpa"><span class="t">${title}</span><span class="q">${esc(q)}</span><div class="row">${btns}</div></div>`;
+}
+
+function renderWork(){
+  const C=CASES[cur], s=st(cur);
+  document.querySelectorAll("#acts button").forEach(b=>{ b.classList.toggle("on", b.dataset.view===view); if(b.dataset.view==="feedback") b.hidden=!s.ended; });
+  let body="";
+  if(view==="chart"){
+    body = `<div class="panel"><div class="ph">Chart Review · Today's visit <span>Scenario</span></div><div class="pb"><p>${esc(C.scenario)}</p></div></div>
+      <div class="panel"><div class="ph">Encounters <span>Last 12 months</span></div><div style="overflow-x:auto"><table class="grid"><thead><tr><th>Date</th><th>Type</th><th>Department</th><th>Provider</th><th>Description</th></tr></thead><tbody>${C.encounters.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+  } else if(view==="info"){
+    const val = (v)=> Array.isArray(v) ? v.map(esc).join("<br>") : esc(v);
+    body = `<div class="panel"><div class="ph">Patient Information Sheet <span>${C.tab}</span></div><table class="grid"><tbody>${C.info.map(r=>`<tr><td class="lbl">${esc(r[0])}</td><td>${val(r[1])}</td></tr>`).join("")}</tbody></table></div>`;
+  } else if(view==="meds"){
+    body = `<div class="panel"><div class="ph">Medications <span>Drug history</span></div><table class="grid"><thead><tr><th>Medication</th><th>Directions</th><th>Indication</th></tr></thead><tbody>${C.meds.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+  } else if(view==="tobacco"){
+    body = `<div class="panel"><div class="ph">Tobacco Use <span>Flowsheet</span></div><table class="grid"><thead><tr><th>Measure</th><th>Value</th><th>Reference values</th></tr></thead><tbody>${C.flow.map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td class="ref">${r[2]}</td></tr>`).join("")}</tbody></table>
+      <div class="foot">${FOOTNOTES}</div></div>`;
+  } else if(view==="resources"){
+    body = RESOURCES_HTML + `<div class="panel"><div class="ph">Your IPE questions <span>${C.tab}</span></div><div class="pb"><ol class="qlist">${C.qs.map((Q,i)=>{
+      const state = !s.started ? "Not started" : (s.closed[i]||i<s.q) ? "Done" : i===s.q && !s.ended ? "In progress" : "Coming up";
+      return `<li><b>${STEPS[i].label}.</b> ${esc(Q.text)}<br><span>${state}</span></li>`; }).join("")}</ol></div></div>`;
+  } else if(view==="feedback"){
+    body = `<div class="panel"><div class="ph">Feedback <span>${C.tab} · ${C.tag}</span></div><div class="pb"><p class="fbtext">${esc(feedbackText(cur))}</p></div></div>
+      <div class="panel"><div class="ph">Rubric results</div><div style="overflow-x:auto">${rubricTable(cur)}</div></div>
+      <div class="panel"><div class="ph">Copy your chat for the assignment <button class="btn pri" type="button" data-copy>Copy chat and feedback</button></div><div class="pb">
+        <p style="color:var(--e-sub)">Includes the full chat, your rubric results, the feedback and the reflection questions. If the button doesn't copy, click in the box, press Ctrl+A then Ctrl+C.</p>
+        <textarea class="transcript" id="transcript" readonly aria-label="Chat transcript">${esc(transcript(cur))}</textarea>
+        <b>Reflection questions</b><ol class="refl">${REFLECT(C.tab).map(q=>`<li>${esc(q)}</li>`).join("")}</ol></div></div>`;
+  }
+  $("work").innerHTML = bannerHtml() + body;
+  syncCompose();
+}
+
+function renderSteps(){
+  const C=CASES[cur], s=st(cur);
+  $("steps").innerHTML = STEPS.map((p,i)=>{
+    let cls="";
+    if(i<C.qs.length){ if(s.started && (i<s.q || s.closed[i] && i!==s.q)) cls="done"; else if(s.started && !s.ended && i===s.q) cls="now"; else if(s.ended && i<=s.q && s.closed[i]) cls="done"; }
+    else { if(s.ended) cls="done"; else if(s.started && s.q>=C.qs.length) cls="now"; }
+    const mark = cls==="done" ? "✓" : (i<4 ? i+1 : "★");
+    return `<button type="button" class="step ${cls}" data-step="${i}" ${cls==="done"?"":"tabindex='-1'"} title="${cls==="done"?"Jump to this part of the chat":""}"><span class="d">${mark}</span><b>${p.k}</b><span>${p.label}</span></button>`;
+  }).join("");
+}
+
+function syncCompose(){
+  const s=st(cur), C=CASES[cur];
+  const box=$("input");
+  box.disabled = s.ended;
+  box.placeholder = !s.started ? "Click Start Simulation to begin" : s.ended ? "Simulation ended" : s.awaiting ? "Pick a sample answer above" : "Type your reply to Maya…";
+  $("btn-send").disabled = busy || s.ended;
+  const left = Math.max(0, CONFIG.maxHints - s.hintsUsed);
+  const hintOff = busy || !s.started || s.ended || s.awaiting || s.q>=C.qs.length || left===0;
+  document.querySelectorAll("#btn-hint,#work [data-hint]").forEach(b=>{
+    b.disabled = hintOff;
+    b.textContent = left===0 ? "No hints left" : `Ask Maya for a hint (${left} left)`;
+  });
+  $("btn-end").disabled = !s.started || s.ended;
+  $("btn-copy-top").hidden = !s.ended;
+  const tr = $("tries");
+  tr.textContent = s.started && !s.ended && s.q<C.qs.length && !s.awaiting ? `Try ${Math.min(s.tries[s.q]+1,CONFIG.maxTries)} of ${CONFIG.maxTries}` : "";
+}
+
+function renderChat(){
+  const s=st(cur), host=$("msgs");
+  if(!s.guideShown){
+    s.guideShown=true;
+    push(cur,{type:"card",html:guideHtml(true),text:"[Guide]"});
+  }
+  if(host.firstChild!==s.el){ host.innerHTML=""; host.appendChild(s.el); }
+  $("chat-sub").textContent = `${CONFIG.botRole} · re: ${CASES[cur].tab}`;
+  scrollChat();
+}
+
+function renderAll(){ renderTabs(); renderStory(); renderWork(); renderSteps(); renderChat(); syncCompose(); }
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+document.addEventListener("click", e=>{
+  const t=e.target.closest("button"); if(!t) return;
+  if(t.dataset.case){ cur=t.dataset.case; view = st(cur).ended ? "feedback" : "chart"; $("confirm-end").hidden=true; renderAll(); return; }
+  if(t.dataset.view){ view=t.dataset.view; renderWork(); return; }
+  if(t.dataset.goto){ view=t.dataset.goto; renderWork(); return; }
+  if(t.hasAttribute("data-start")){ startSim(cur); return; }
+  if(t.hasAttribute("data-hint")){ giveHint(); return; }
+  if(t.hasAttribute("data-end")){ $("confirm-end").hidden=false; return; }
+  if(t.hasAttribute("data-copy")){ copyTranscript(); return; }
+  if(t.hasAttribute("data-view-fb")){ view="feedback"; renderWork(); return; }
+  if(t.hasAttribute("data-guide")){ openGuide(); return; }
+  if(t.dataset.opt!==undefined){ pickOption(cur, +t.dataset.q, +t.dataset.opt); return; }
+  if(t.dataset.skip!==undefined){ skipOptions(cur, +t.dataset.skip); return; }
+  if(t.dataset.step!==undefined && t.classList.contains("step") && t.classList.contains("done")){
+    const i=+t.dataset.step;
+    const el = i<4 ? document.getElementById(`${cur}-div-${i}`) : st(cur).el.lastElementChild;
+    if(el) el.scrollIntoView({behavior:"smooth",block:"start"});
+    return;
+  }
+});
+$("btn-send").addEventListener("click", send);
+$("input").addEventListener("keydown", e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
+$("btn-hint").addEventListener("click", giveHint);
+$("btn-end").addEventListener("click", ()=>{ $("confirm-end").hidden=false; });
+$("end-no").addEventListener("click", ()=>{ $("confirm-end").hidden=true; });
+$("end-yes").addEventListener("click", ()=>{ $("confirm-end").hidden=true; endSim(cur); });
+$("btn-copy-top").addEventListener("click", copyTranscript);
+function openGuide(){ $("modal-body").innerHTML = guideHtml(false); $("modal").hidden=false; $("modal-close").focus(); }
+$("btn-guide").addEventListener("click", openGuide);
+$("modal-close").addEventListener("click", ()=>{ $("modal").hidden=true; });
+$("modal").addEventListener("click", e=>{ if(e.target.id==="modal") $("modal").hidden=true; });
+document.addEventListener("keydown", e=>{ if(e.key==="Escape") $("modal").hidden=true; });
+
+// Link options: #lucy, #brian or #margaret opens that case
+(function(){ const h=(location.hash||"").slice(1); if(CASES[h]) cur=h; })();
+$("engine-badge").textContent = CONFIG.engine==="claude" ? "Live: Claude" : "Practice engine · no AI";
+renderAll();
+</script>
