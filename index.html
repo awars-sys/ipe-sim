@@ -181,8 +181,6 @@ mark.hl:hover{background:#ffe94d;text-decoration:line-through;text-decoration-co
 [data-hlk]{cursor:text}
 .rules{background:#fffbe0;border:1px solid #efe08a;border-radius:5px;padding:8px 10px;display:grid;gap:4px}
 .rules ul{margin:0;padding-left:18px;display:grid;gap:3px}
-.qguide td:first-child{width:170px}
-.qguide ul{margin:4px 0 0;padding-left:18px}
 .part{font-size:10.5px;color:var(--e-link);font-weight:700}
 [hidden]{display:none!important}
 .noscript{max-width:640px;margin:40px auto;background:#fff;border:1px solid var(--e-line);border-radius:6px;padding:16px 18px}
@@ -567,7 +565,7 @@ function guideHtml(withStart){
     <li><b>Highlight the main problems</b> as you read through the case.</li>
   </ul></div>
   <ol class="guide">
-    <li><span><b>Read the chart, left to right.</b> Start with the patient summary on the left, then open each tab in turn: Chart Review, Patient Info, Medications and Tobacco. IPE Resources explains each question and has the 5 As, 5 Rs, 5 Ds and score guides.</span></li>
+    <li><span><b>Read the chart, left to right.</b> Start with the patient summary on the left, then open each tab in turn: Chart Review, Patient Info, Medications and Tobacco. IPE Resources has the 5 As, 5 Rs, 5 Ds and score guides.</span></li>
     <li><span><b>Highlight the main problems.</b> Use the highlight feature in the chart to mark the patient's main problems as you read. These problems drive your referrals and your treatment plan, and students who do this well usually score higher.</span></li>
     <li><span><b>Start the simulation.</b> Maya, a D2 dental student, will message you about your shared patient.</span></li>
     <li><span><b>Answer 4 questions in your own words:</b> Q1 Scope of practice, Q2 Referrals, Q3 Treatment plan (4 short parts: dependence, CO level, readiness, then your approach) and Q4 Joint plan. The timeline above shows where you are.</span></li>
@@ -836,35 +834,6 @@ function selectionInChart(){
   return [...document.querySelectorAll("#work [data-hlk], #story [data-hlk]")].some(el=>r.intersectsNode(el));
 }
 
-function qGuideHtml(C, s){
-  const part = (k)=>C.qs.filter(Q=>Q.step===k);
-  const status = (k)=>{
-    const idx=C.qs.map((Q,i)=>Q.step===k?i:-1).filter(i=>i>=0);
-    if(!s.started) return "Not started";
-    if(idx.every(i=>s.closed[i]||i<s.q)) return "Done";
-    if(idx.includes(s.q) && !s.ended) return "In progress";
-    return s.ended ? "Not reached" : "Coming up";
-  };
-  const q3 = part(2).map(Q=>`<li><b>Part ${Q.part}:</b> ${esc(Q.text.replace(/^Open the Tobacco tab\. /,""))}</li>`).join("");
-  const row = (k, what, look, strong) => `<tr><td><b>${STEPS[k].k} · ${STEPS[k].label}</b><br><span class="sub">${status(k)}</span></td><td>${what}<br><span class="sub"><b>Where to look:</b> ${look}</span><br><span class="sub"><b>A strong answer:</b> ${strong}</span></td></tr>`;
-  return `<div class="panel"><div class="ph">Your IPE questions: what each one asks <span>${C.tab} · read before you start</span></div>
-  <table class="grid res qguide"><tbody>
-  ${row(0, `<b>The question:</b> ${esc(part(0)[0].text)}<br>Maya wants to know what <b>you, as a student pharmacist,</b> can spot and do for this patient. Think about medicines, side effects, inhaler or dosing technique, adherence and counseling.`,
-     "Medications tab and Patient Info (drug history, medical history).",
-     "names a specific medication issue, links it to the patient's complaint, and says what you would do about it. Maya then shares the dental side.")}
-  ${row(1, `<b>The question:</b> ${esc(part(1)[0].text)}<br>Choose the <b>3 referrals or consultations</b> that would help most, and give a reason for each. No ranking is needed.`,
-     "the problems you highlighted, plus the social and medical history in Patient Info.",
-     "each referral matches a real problem in the case (for example dental, pharmacy, counseling or social work) and has a clear reason.")}
-  ${row(2, `Q3 has <b>4 short parts</b>. Answer them one at a time:<ul>${q3}</ul>`,
-     "the Tobacco tab (use the Reference values column) and IPE Resources (5 As, 5 Rs, 5 Ds, readiness ruler).",
-     "reads each number against its reference values, says what it means for this patient, then builds a plan that fits how ready they are (5 As, and the 5 Rs if they aren't ready).")}
-  ${row(3, `<b>The question:</b> ${esc(part(3)[0].text)}<br>Write a short note for the chart that both of you agree on.`,
-     "your answers to Q1 to Q3 and Maya's dental input.",
-     "says what pharmacy will do, what dentistry will do, who else you'll refer to, the tobacco plan, and when you'll follow up.")}
-  </tbody></table>
-  <div class="foot">How you're assessed: each question has key points from the faculty rubric. You get up to ${CONFIG.maxTries} tries per question and ${CONFIG.maxHints} hints per case. Your results appear after the joint plan and again when you end the simulation.</div></div>`;
-}
-
 function renderWork(){
   const C=CASES[cur], s=st(cur);
   document.querySelectorAll("#acts button").forEach(b=>{ b.classList.toggle("on", b.dataset.view===view); if(b.dataset.view==="feedback") b.hidden=!s.ended; });
@@ -884,7 +853,7 @@ function renderWork(){
     body = `<div class="panel"><div class="ph">Tobacco Use <span>Flowsheet</span></div><table class="grid"><thead><tr><th>Measure</th><th>Value</th><th>Reference values</th></tr></thead><tbody>${C.flow.map((r,ri)=>`<tr><td>${esc(r[0])}</td><td data-hlk="tob${ri}">${r[1]}</td><td class="ref">${r[2]}</td></tr>`).join("")}</tbody></table>
       <div class="foot">${FOOTNOTES}</div></div>`;
   } else if(view==="resources"){
-    body = qGuideHtml(C, s) + RESOURCES_HTML;
+    body = RESOURCES_HTML;
   } else if(view==="feedback"){
     body = `<div class="panel"><div class="ph">Feedback <span>${C.tab} · ${C.tag}</span></div><div class="pb"><p class="fbtext">${esc(feedbackText(cur))}</p></div></div>
       <div class="panel"><div class="ph">Rubric results</div><div style="overflow-x:auto">${rubricTable(cur)}</div></div>
