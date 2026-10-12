@@ -1,3 +1,4 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>IPE Dental Collaborator</title>
 <style>
 /* Layout: desktop EHR workstation (laptop-first). Storyboard | chart area | Secure Chat with Q1-Q4 timeline.
@@ -22,7 +23,7 @@ body{background:var(--e-desk);color:var(--e-text);font-family:var(--font);font-s
 button{font:inherit;cursor:pointer}
 button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid var(--e-link);outline-offset:1px}
 .scroller{height:100%;overflow:auto;border-radius:6px;box-shadow:0 2px 10px rgba(20,40,60,.18)}
-.app{min-width:1180px;height:100%;min-height:660px;display:grid;grid-template-rows:auto auto auto 1fr;background:var(--e-pane);border:1px solid var(--e-line)}
+.app{min-width:1280px;height:100%;min-height:660px;display:grid;grid-template-rows:auto auto auto 1fr;background:var(--e-pane);border:1px solid var(--e-line)}
 
 /* Top chrome */
 .train{background:var(--e-train);color:#3b2f00;font-weight:700;font-size:11px;letter-spacing:.06em;text-align:center;padding:3px 8px;text-transform:uppercase}
@@ -41,7 +42,7 @@ button:focus-visible,textarea:focus-visible,a:focus-visible{outline:2px solid va
 .ptab small{font-weight:400;color:var(--e-sub)}
 
 /* Body grid */
-.body{display:grid;grid-template-columns:220px minmax(0,1fr) 430px;min-height:0}
+.body{display:grid;grid-template-columns:210px minmax(0,1fr) minmax(560px,40%);min-height:0}
 .story{background:var(--e-story);border-right:1px solid var(--e-story-line);padding:12px;display:flex;flex-direction:column;gap:9px;overflow:auto}
 .photo{width:54px;height:54px;border-radius:50%;background:#b9c9da;display:grid;place-items:center;font-weight:700;color:#3b5671;font-size:17px}
 .pname{font-size:16px;font-weight:700}
@@ -142,7 +143,7 @@ table.grid{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums
 .guide li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
 .guide li::before{counter-increment:g;content:counter(g);width:20px;height:20px;border-radius:50%;background:var(--e-sel);color:var(--e-link);font-weight:700;font-size:11px;display:grid;place-items:center}
 .compose{border-top:1px solid var(--e-line);padding:8px;display:grid;gap:6px;background:var(--e-white)}
-.compose textarea{width:100%;resize:none;height:62px;border:1px solid var(--e-line);border-radius:3px;padding:6px 7px;font:inherit;color:var(--e-text);background:var(--e-white)}
+.compose textarea{width:100%;resize:vertical;min-height:84px;height:84px;max-height:240px;border:1px solid var(--e-line);border-radius:3px;padding:6px 7px;font:inherit;color:var(--e-text);background:var(--e-white)}
 .compose .row{justify-content:space-between}
 .tries{font-size:11px;color:var(--e-sub)}
 .confirm{background:var(--e-alert-bg);border:1px solid #e3aaa6;border-radius:4px;padding:6px 8px;display:flex;gap:6px;align-items:center;justify-content:space-between;font-size:12px}
@@ -163,7 +164,24 @@ table.grid{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums
 .grid.res td:first-child{width:150px}
 .sub{font-size:11px;color:var(--e-sub)}
 ul.tight{margin:4px 0 0;padding-left:18px}
+/* Highlighter */
+mark.hl{background:#fff176;color:inherit;border-radius:2px;padding:0 1px;cursor:pointer;box-shadow:0 0 0 1px #f2d63c}
+mark.hl:hover{background:#ffe94d;text-decoration:line-through;text-decoration-color:rgba(0,0,0,.35)}
+.hl-float{position:fixed;z-index:40;background:#fff176;border:1px solid #d4b81f;color:#3b2f00;font-weight:700;border-radius:4px;padding:4px 10px;box-shadow:0 2px 8px rgba(0,0,0,.2);font-size:12px}
+.hl-float:hover{background:#ffe94d}
+.hlbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#fffbe0;border:1px solid #efe08a;border-radius:3px;padding:6px 10px;font-size:12px;color:#5a4a00}
+.hlbar .sw{display:inline-block;width:12px;height:12px;background:#fff176;border:1px solid #d4b81f;border-radius:2px;vertical-align:-2px;margin-right:4px}
+.hlbar .sp{flex:1}
+.hlchips{display:flex;flex-wrap:wrap;gap:5px}
+.hlchip{background:#fff176;border:1px solid #e6cf3a;border-radius:3px;padding:1px 7px;font-size:12px}
+[data-hlk]{cursor:text}
+.rules{background:#fffbe0;border:1px solid #efe08a;border-radius:5px;padding:8px 10px;display:grid;gap:4px}
+.rules ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.qguide td:first-child{width:170px}
+.qguide ul{margin:4px 0 0;padding-left:18px}
+.part{font-size:10.5px;color:var(--e-link);font-weight:700}
 [hidden]{display:none!important}
+.noscript{max-width:640px;margin:40px auto;background:#fff;border:1px solid var(--e-line);border-radius:6px;padding:16px 18px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
 </style>
 
@@ -203,6 +221,7 @@ ul.tight{margin:4px 0 0;padding-left:18px}
       <div class="compose" id="compose">
         <div class="confirm" id="confirm-end" hidden><span>End now? You'll get feedback on what you've done so far.</span><span class="row"><button class="btn danger" type="button" id="end-yes">End Simulation</button><button class="btn" type="button" id="end-no">Keep going</button></span></div>
         <textarea id="input" aria-label="Message Maya" placeholder="Click Start Simulation to begin"></textarea>
+        <button class="hl-float" type="button" id="hl-btn" hidden>Highlight</button>
         <div class="row">
           <span class="row"><button class="btn hint" type="button" id="btn-hint">Ask Maya for a hint (3 left)</button><span class="tries" id="tries"></span></span>
           <span class="row"><button class="btn" type="button" id="btn-end">End Simulation</button><button class="btn pri" type="button" id="btn-send">Send</button></span>
@@ -225,8 +244,8 @@ ul.tight{margin:4px 0 0;padding-left:18px}
    CONFIG: change these without touching the rest of the file
    ===================================================================== */
 const CONFIG = {
-  engine: "practice",                  // "practice" = offline keyword engine (no cost). "claude" = live, via your server function
-  apiUrl: "/.netlify/functions/maya",  // only used when engine is "claude"
+  engine: "practice",                  // "claude" = live, via the Netlify function. "practice" = offline keyword engine (no cost)
+  apiUrl: "/api/maya",                 // the Netlify function's address (set in netlify/functions/maya.mjs)
   botName: "Maya Chen",
   botRole: "Dental Student (D2)",
   maxTries: 3,                         // tries per question before Maya moves on
@@ -234,6 +253,9 @@ const CONFIG = {
   caseOrder: ["margaret", "lucy", "brian"],
   startCase: "margaret"
 };
+
+// Add ?practice to the link (e.g. yoursite.netlify.app/?practice) to use the free offline engine.
+if (new URLSearchParams(location.search).has("practice")) CONFIG.engine = "practice";
 
 const STEPS = [
   {k:"Q1", label:"Scope of practice"},
@@ -248,7 +270,9 @@ const STEPS = [
    ===================================================================== */
 const LINKS = {
   ftnd: "https://www.aarc.org/wp-content/uploads/2014/08/Fagerstrom_test.pdf",
-  co: "https://www.asthmaandlung.org.uk/symptoms-tests-treatments/tests/exhaled-carbon-monoxide"
+  co: "https://www.asthmaandlung.org.uk/symptoms-tests-treatments/tests/exhaled-carbon-monoxide",
+  ready: "https://casaa.unm.edu/assets/inst/readiness-ruler.pdf",
+  fiveD: "https://www.rwjbh.org/blog/2025/may/manage-nicotine-craving-with-the-5-ds-of-quittin/"
 };
 function bands(list, hit){
   return `<div class="bands">${list.map((b,i)=>`<span class="${i===hit?"hit":""}">${b}</span>`).join("")}</div>`;
@@ -261,7 +285,8 @@ const TTFC = ["Within 5 minutes = 3 points","5–30 minutes = 2 points","31–60
 const ttfcRef = (i) => bands(TTFC, i) + `<span class="src">Fagerström item 1<sup>1</sup></span>`;
 const CPD = ["10 or less = 0 points","11–20 = 1 point","21–30 = 2 points","31 or more = 3 points"];
 const cpdRef = (i) => bands(CPD, i) + `<span class="src">Fagerström item 4<sup>1</sup></span>`;
-const READY = "0 (not ready) to 10 (very ready) to quit in the next 30 days";
+const READYB = ["0–2 = not ready to change","3–5 = unsure (ambivalent)","6–9 = ready to change","10 = already trying to change"];
+const readyRef = (score, note) => bands(READYB, score<=2?0:score<=5?1:score<=9?2:3) + `<span class="src">Readiness ruler<sup>3</sup>${note?" · "+note:""}</span>`;
 
 /* Referral types used to check "names 3 referrals" (no ranking needed) */
 const REFS = [/dent/i,/pharmac/i,/primary care|\bpcp\b|physician|\bdoctor\b/i,/counsel|psycholog|therap/i,/psychiat/i,/dietit|dietic|nutrition/i,/social work/i,/pulmon/i];
@@ -299,7 +324,7 @@ lucy: {
   flow:[["Smoking status","Current, 5 cigarettes/day (range 5–20; was 1 pack/day before her quit attempt)",cpdRef(0)],
     ["Time to first cigarette","Immediately after waking",ttfcRef(0)],
     ["Exhaled CO","<span class='abn'>24 ppm</span>",coRef(24)],
-    ["Readiness to quit (next 30 days)","5 / 10",READY],
+    ["Readiness to quit (next 30 days)","5 / 10",readyRef(5)],
     ["Fagerström score","Not given in this case",ftndRef(null)],
     ["Past quit attempts","2 weeks, cold turkey, no medicines; relapsed after job loss",""],
     ["Triggers","Stress, other smokers",""],
@@ -307,7 +332,7 @@ lucy: {
   intro:"Hi! I'm Maya Chen, the D2 dental student on Lucy's care team. I just saw her for those painful white patches on her buccal mucosa, and we're treating it as leukoplakia, so her smoking really worries me. Before I share the dental side: is there anything you noticed as a student pharmacist to assess her needs?",
   reflectOn:"managing a patient struggling with socioeconomic setbacks and substance relapse",
   qs:[
-    { text:"Is there anything you noticed as a student pharmacist to assess Lucy's needs?",
+    { step:0, label:"Scope of practice", text:"Is there anything you noticed as a student pharmacist to assess Lucy's needs?",
       ask:null,
       must:["rinse","thrush"],
       points:[
@@ -324,7 +349,7 @@ lucy: {
       share:"Here's what a complete pharmacy answer covers: counsel her to rinse and spit after every Symbicort dose, because it limits the steroid left in her mouth and helps prevent oral thrush, which would worsen her mouth pain. A spacer also lowers the risk, and it's worth reviewing her inhaler technique (priming, breathing, holding her breath).",
       perspective:"From the dental side, leukoplakia shows up as white or gray patches, often because something like tobacco is irritating the mouth, and it can raise her risk of oral cancer, which matters even more with her mom's head and neck cancer. I'll do a biopsy, since that's the only way to know whether it could become cancer, and I'll advise her to stop tobacco now."
     },
-    { text:"If you are the first health professional to encounter Lucy, which referrals or consultations would you make? Name your top 3 and explain why.",
+    { step:1, label:"Referrals", text:"If you are the first health professional to encounter Lucy, which referrals or consultations would you make? Name your top 3 and explain why.",
       ask:"Next one. If you were the first health professional to see Lucy, which referrals or consultations would you make? Name your top 3 and tell me why.",
       must:["three","dental","mental","why"],
       points:[
@@ -341,19 +366,60 @@ lucy: {
       share:"Here's how a complete answer could look: possible referrals are dental, pharmacy, primary care, counselor, psychiatrist, dietitian and social worker. A strong top 3 is dental (biopsy of the leukoplakia), pharmacy (Symbicort counseling and cessation support), and a counselor or psychiatrist for her anxiety, each with a reason.",
       perspective:"I'd definitely include dental, because the biopsy tells us whether this could become oral cancer. Her anxiety is what pulled her back to smoking, so counseling or psychiatry belongs in there too."
     },
-    { text:"Based on Lucy's readiness to quit score, CO level and time to first cigarette, provide a tobacco dependence treatment plan.",
-      ask:"Here's what I keep thinking about. Lucy says she's a 5/10 on readiness, but her CO is 24 ppm and she smokes right when she wakes up. Using the 5 As, what tobacco dependence treatment plan would you suggest?",
-      must:["depend","readiness","fiveR"],
+    { step:2, part:"A", label:"Treatment plan · Part A: Time to first cigarette",
+      text:"Open the Tobacco tab. Lucy smokes her first cigarette immediately after waking. What does that tell you about her nicotine dependence? (Lucy has no Fagerström score, so time to first cigarette is the best marker.)",
+      ask:"Let's work through her tobacco numbers together, one at a time. Pull up the Tobacco tab. First: Lucy has her first cigarette right after she wakes up. What does that tell you about her nicotine dependence?",
+      must:["depend"],
+      points:[
+        {id:"depend",label:"High nicotine dependence (first cigarette within 5 minutes scores highest on Fagerström item 1)",re:/depend|addict|high|strong|heav|physical|within 5|3 points/i,ack:"Exactly, smoking on waking is a strong sign of high dependence.",
+          hints:["Look at the reference values next to her time to first cigarette. How many points is that on the Fagerström scale?","Within 5 minutes of waking scores the highest on that Fagerström item. What does that suggest about her dependence?","Smoking right after waking usually means strong physical dependence. How would you describe hers?"]},
+        {id:"crave",label:"Expects strong cravings or withdrawal when she quits",re:/crav|withdraw|urge/i,ack:"Good, that tells us she'll likely have strong cravings when she quits.",
+          hints:["What might she feel when she tries to stop?","What happens to someone this dependent in the first days without a cigarette?","High dependence usually means strong cravings and withdrawal. Would you expect that for Lucy?"]}
+      ],
+      pass:"That's how I read it too.",
+      share:"Her first cigarette right after waking scores 3 points, the highest, on the first Fagerström item. That points to high physical nicotine dependence, so she'll likely have strong cravings and withdrawal when she tries to quit.",
+      perspective:null
+    },
+    { step:2, part:"B", label:"Treatment plan · Part B: CO level",
+      text:"Lucy's exhaled CO is 24 ppm. What does that tell you?",
+      ask:"Next number: her exhaled CO is 24 ppm. What does that tell you?",
+      must:["high"],
+      points:[
+        {id:"high",label:"CO 24 ppm is high (10+ ppm): she is smoking now or very recently",re:/high|elevat|above|over|10\+|abnormal|current|recent|active/i,ack:"Right, 24 ppm is well into the high range, so she's actively smoking.",
+          hints:["Check the CO reference values in the Tobacco tab. Which range does 24 ppm fall in?","10 ppm and over is high. What does a reading of 24 say about her recent smoking?","24 ppm is far above the non-smoker cut-off of under 6. Is she smoking now?"]},
+        {id:"use",label:"Uses the CO reading as feedback to motivate her or track progress",re:/track|monitor|progress|motivat|show her|feedback|baseline|compare|recheck|re-?test/i,ack:"Nice, showing her the number can be a motivator too.",
+          hints:["Could the CO reading be useful when you talk with her?","How could you use this number at her next visit?","Showing patients their CO level, and how fast it drops after quitting, can motivate them."]}
+      ],
+      pass:"Agreed.",
+      share:"A CO of 24 ppm is in the high range (10 ppm and over) and far above the non-smoker cut-off of under 6 ppm, so she is smoking now. It's also a good motivator: CO drops quickly after quitting, so we can recheck it to show her progress.",
+      perspective:null
+    },
+    { step:2, part:"C", label:"Treatment plan · Part C: Readiness to quit",
+      text:"Lucy rates her readiness to quit in the next 30 days as 5 out of 10. What does that tell you?",
+      ask:"Last number: she says she's a 5 out of 10 on readiness to quit in the next 30 days. What does that tell you?",
+      must:["unsure"],
+      points:[
+        {id:"unsure",label:"Unsure or ambivalent about quitting (contemplation), not ready for a quit date",re:/unsure|ambivalen|contemplat|not ready|on the fence|undecided|thinking about|mixed|torn|middle|half/i,ack:"Yes, 5/10 means she's unsure.",
+          hints:["Check the readiness reference values in the Tobacco tab. Where does 5 fall?","3 to 5 on the readiness ruler means unsure. What stage of change does that suggest?","A 5/10 means she's ambivalent. Is she ready to set a quit date?"]},
+        {id:"approach",label:"So build her motivation first rather than pushing a quit date",re:/motivat|5 ?r|five r|not (push|force|rush)|explore|interview/i,ack:"Right, building motivation comes first.",
+          hints:["What would you focus on first with someone who's unsure?","Would you push a quit date, or work on her reasons first?","With an unsure patient, building motivation comes before a quit plan."]}
+      ],
+      pass:"Exactly how I'd read it.",
+      share:"A 5/10 is in the unsure range (3 to 5) on the readiness ruler. She's ambivalent, in the contemplation stage, so she isn't ready to set a quit date yet. The first step is building her motivation.",
+      perspective:null
+    },
+    { step:2, part:"D", label:"Treatment plan · Part D: Your approach",
+      text:"Based on these scores, how would you approach Lucy's treatment plan? Use the 5 As, and the 5 Rs where they fit.",
+      ask:"So putting it together: high dependence, a CO of 24 ppm and only 5/10 on readiness. How would you approach her treatment plan? Use the 5 As, and the 5 Rs where they fit her.",
+      must:["fiveR"], minMet:2,
       flag:{re:/quit date|set a date|(start|begin) (her )?(on )?(the )?(patch|varenicline|chantix|bupropion|nrt)/i,msg:"Hmm, she's only a 5/10. Would she really follow a quit date or start a medicine right now? How could we work with her ambivalence first?"},
       points:[
-        {id:"depend",label:"Assess: high dependence (smokes on waking, CO 24 ppm)",re:/depend|first cigarette|wak|carbon monoxide|\bco\b|24/i,ack:"Right, smoking on waking and a CO of 24 point to high dependence.",
-          hints:["What do her CO level and time to first cigarette tell you?","Smoking right after waking is a classic marker of something. What is it?","Her first cigarette on waking and CO of 24 ppm suggest how strong a nicotine dependence?"]},
-        {id:"readiness",label:"Assess: ambivalent, not ready yet (5/10)",re:/contemplat|ambivalen|not ready|unsure|5 ?\/ ?10|5 out of 10|readiness/i,ack:"Yes, 5/10 tells us she's ambivalent.",
-          hints:["What does her 5/10 readiness score say about where she is?","Is she ready to quit in the next 30 days, or still thinking about it?","A 5/10 suggests she's in contemplation. How would that change your plan?"]},
         {id:"fiveR",label:"Assist: 5 Rs / motivational approach, no forced quit date",re:/5 ?r|five r|relevan|roadblock|reward|repetition|motivation(al)? interview|\bmi\b/i,ack:"The 5 Rs fit her really well.",
           hints:["For someone who isn't ready yet, which counseling framework fits better than a quit plan?","There's a 5-part approach for patients who are ambivalent about quitting. It's in the IPE Resources tab.","Think Relevance, Risks, Rewards, Roadblocks and Repetition. How would you use them with Lucy?"]},
         {id:"advise",label:"Advise: clear, personal advice to quit",re:/advis|benefit|health|cancer|asthma|blood pressure/i,ack:"Linking quitting to her own health makes the advice stick.",
           hints:["What would you advise her, and how would you make it personal?","How might quitting help her mouth, asthma or blood pressure?","Connect the advice to her sores and her mom's cancer history."]},
+        {id:"later",label:"Lets her know medicines are available when she's ready",re:/when (she'?s|she is) ready|medic|nrt|patch|pharmacotherap|options?/i,ack:"Good, keeping that door open matters.",
+          hints:["What could you offer her for later?","Is there help for cravings you could mention, without pushing it now?","Letting her know medicines are there when she's ready keeps the door open."]},
         {id:"arrange",label:"Arrange: quitline, resources or specialist follow-up",re:/quitline|quit ?now|800|refer|follow|specialist|clinic|resource/i,ack:"Good, having follow-up lined up matters.",
           hints:["What would you arrange for after today?","Which resources could she use between visits?","A quitline number and a referral to a cessation clinic would cover Arrange."]}
       ],
@@ -361,7 +427,7 @@ lucy: {
       share:"Here's a complete plan. Ask: we already know her smoking history. Advise: quitting will help her mouth, asthma and blood pressure, and nicotine withdrawal adds to stress. Assess: she's in contemplation; smoking on waking shows high dependence, CO 24 ppm is high, and 5/10 shows ambivalence. Assist: use the 5 Rs (what she likes and dislikes about smoking, her goals like a new job and saving money, what helped her quit before, whether her neighbor might quit with her) and let her know medicines are there when she's ready, rather than forcing a quit date. Arrange: quitline or online resources and a referral to a cessation clinic.",
       perspective:"Chairside, I can keep reinforcing the 5 Rs, especially how smoking affects her mouth sores, and remind her that help with cravings is there when she's ready."
     },
-    { text:"Write a brief joint summary plan for Lucy's file.",
+    { step:3, label:"Joint plan", text:"Write a brief joint summary plan for Lucy's file.",
       ask:"Let's wrap up. Can you write a brief joint summary plan for Lucy's file, covering what pharmacy and dentistry will each do?",
       must:["pharm","dent","tob"],
       points:[
@@ -395,14 +461,14 @@ brian: {
   flow:[["Smoking status","Former smoker, smoke-free 4 weeks (was ½ ppd menthol)",cpdRef(0)],
     ["Time to first cigarette (before quitting)","Within 30 minutes of waking",ttfcRef(1)],
     ["Exhaled CO","4 ppm",coRef(4)],
-    ["Motivation to stay quit","9 / 10","0 (not motivated) to 10 (very motivated)"],
+    ["Motivation to stay quit","9 / 10",readyRef(9,"he has already quit, so this rates his motivation to stay quit")],
     ["Fagerström score","Not given in this case",ftndRef(null)],
     ["Current cessation medicine","Varenicline 1 mg BID",""],
     ["Since quitting","Gained about 10 lbs; strong cravings with divorce stress",""]],
   intro:"Hi! I'm Maya Chen, the D2 dental student on Brian's team. He came in with severe pain in his back left molar, and I found a cavitated lesion on his lower left first molar plus generalized periodontitis. He's 4 weeks smoke-free, which is great, but he's under a lot of stress. Is there anything you noticed as a student pharmacist to assess his needs?",
   reflectOn:"helping a patient stay smoke-free through major life stress",
   qs:[
-    { text:"Is there anything you noticed as a student pharmacist to assess Brian's needs?",
+    { step:0, label:"Scope of practice", text:"Is there anything you noticed as a student pharmacist to assess Brian's needs?",
       ask:null, must:["adh","var"],
       points:[
         {id:"adh",label:"Adherence support for missed doses",re:/adher|remind|pill ?(box|organi)|alarm|routine|forget|calendar|app\b/i,ack:"Memory aids could really help him.",
@@ -420,7 +486,7 @@ brian: {
       share:"Here's what a complete answer could cover: adherence support (pill organizer, phone reminders, pairing doses with daily routines), counseling to keep taking varenicline as prescribed for the full course, and possibly short-acting NRT for breakthrough cravings. You could also add a short-term pain plan and a check of his allergy medicines.",
       perspective:"On the dental side, the cavitated lower left first molar is the likely cause of his pain, so he needs a restoration or possibly a root canal or extraction. His periodontitis needs scaling and root planing, and staying smoke-free will help his gums heal."
     },
-    { text:"If you are the first health professional to encounter Brian, which referrals or consultations would you make? Name your top 3 and explain why.",
+    { step:1, label:"Referrals", text:"If you are the first health professional to encounter Brian, which referrals or consultations would you make? Name your top 3 and explain why.",
       ask:"Next one. If you were the first health professional to see Brian, which referrals or consultations would you make? Name your top 3 and tell me why.",
       must:["three","dental","stress","why"],
       points:[
@@ -437,15 +503,56 @@ brian: {
       share:"Here's how a complete answer could look: possible referrals are dental, pharmacy, primary care, social worker or psychologist, dietitian and psychiatrist. A strong top 3 is dental (severe tooth pain and periodontitis), pharmacy (adherence and varenicline), and a social worker or psychologist (divorce stress is his biggest relapse risk), each with a reason.",
       perspective:"Dental has to be in there because he's in pain. Support for the divorce stress matters just as much, since that's what could pull him back to smoking."
     },
-    { text:"Based on Brian's readiness to quit score, CO level and time to first cigarette, provide a tobacco dependence treatment plan.",
-      ask:"His CO is 4 ppm and he says he's a 9/10 to stay quit, but the cravings are strong with the divorce. Using the 5 As, what's our tobacco plan for him?",
-      must:["abst","relapse","meds"],
+    { step:2, part:"A", label:"Treatment plan · Part A: Time to first cigarette",
+      text:"Open the Tobacco tab. Before he quit, Brian smoked within 30 minutes of waking. What does that tell you about his nicotine dependence? (Brian has no Fagerström score, so time to first cigarette is the best marker.)",
+      ask:"Let's work through his tobacco numbers together, one at a time. Pull up the Tobacco tab. First: before he quit, Brian smoked within 30 minutes of waking. What does that tell you about his nicotine dependence?",
+      must:["depend"],
+      points:[
+        {id:"depend",label:"Moderate to high nicotine dependence (5–30 minutes = 2 points on Fagerström item 1)",re:/depend|addict|moderate|high|strong|physical|2 points/i,ack:"Right, that points to real physical dependence.",
+          hints:["Look at the reference values next to his time to first cigarette. How many points is that on the Fagerström scale?","5 to 30 minutes after waking scores 2 out of 3 on that Fagerström item. What does that suggest?","Smoking within 30 minutes of waking shows physical dependence. How strong would you say his was?"]},
+        {id:"risk",label:"Links his dependence to his cravings and relapse risk now",re:/crav|relapse|withdraw|urge|risk|varenicline/i,ack:"Good, that explains why his cravings are so strong right now.",
+          hints:["How might his past dependence affect him now that he's quit?","He's having strong cravings. Does his dependence help explain that?","A dependent smoker 4 weeks out is still at real risk of relapse. Would you agree?"]}
+      ],
+      pass:"That's how I read it too.",
+      share:"Smoking within 30 minutes of waking scores 2 points on the first Fagerström item, which points to moderate to high physical dependence. That helps explain his strong cravings now and why staying on varenicline matters.",
+      perspective:null
+    },
+    { step:2, part:"B", label:"Treatment plan · Part B: CO level",
+      text:"Brian's exhaled CO is 4 ppm. What does that tell you?",
+      ask:"Next number: his exhaled CO is 4 ppm. What does that tell you?",
+      must:["normal"],
+      points:[
+        {id:"normal",label:"CO 4 ppm is in the low, normal range (1–4 ppm): confirms he isn't smoking",re:/normal|low|non.?smok|abstin|not smok|smoke.?free|quit|confirm|below|under 6/i,ack:"Right, his CO of 4 is in the normal range, so he really is smoke-free.",
+          hints:["Check the CO reference values in the Tobacco tab. Which range does 4 ppm fall in?","1 to 4 ppm is normal, even in non-smokers. What does that say about Brian?","His CO is under the non-smoker cut-off of 6. Does that confirm he's stayed quit?"]},
+        {id:"praise",label:"Uses the reading to praise and reinforce his success",re:/prais|congrat|reinforc|motivat|encourag|proof|success|celebrat|great job/i,ack:"Nice, he deserves to hear that.",
+          hints:["How could you use this result with Brian?","Would sharing the number with him help his motivation?","A normal CO is proof his quit is working. Would you tell him so?"]}
+      ],
+      pass:"Agreed.",
+      share:"A CO of 4 ppm is in the low, normal range (1 to 4 ppm) and under the non-smoker cut-off of 6 ppm, which confirms he's not smoking. It's great evidence to praise his success.",
+      perspective:null
+    },
+    { step:2, part:"C", label:"Treatment plan · Part C: Motivation to stay quit",
+      text:"Brian rates his motivation to stay smoke-free as 9 out of 10. What does that tell you?",
+      ask:"Last number: he says he's a 9 out of 10 on motivation to stay smoke-free. What does that tell you?",
+      must:["motivated"],
+      points:[
+        {id:"motivated",label:"Highly motivated to stay quit (action stage)",re:/motivat|high|commit|confident|determin|action|maintenance|9/i,ack:"Yes, he's very committed.",
+          hints:["Check the readiness reference values in the Tobacco tab. Where does 9 fall?","9 out of 10 is near the top of the scale. What does that say about his commitment?","He's already quit and rates himself 9/10. What stage of change is that?"]},
+        {id:"risk",label:"But the divorce stress and cravings still put him at high relapse risk",re:/stress|divorce|relapse|crav|risk|trigger/i,ack:"Exactly, motivation alone won't carry him through the stress.",
+          hints:["Is high motivation enough on its own here?","What's going on in his life that could pull him back to smoking?","His divorce and cravings are real relapse risks, even at 9/10. How would you factor that in?"]}
+      ],
+      pass:"Exactly how I'd read it.",
+      share:"9/10 is near the top of the readiness ruler: he's highly motivated to stay quit and is in the action stage. But the divorce stress and strong cravings put him at high risk of relapse, so motivation alone isn't enough.",
+      perspective:null
+    },
+    { step:2, part:"D", label:"Treatment plan · Part D: Your approach",
+      text:"Based on these scores, how would you approach Brian's plan? He has already quit, so use the 5 As with a focus on preventing relapse.",
+      ask:"So he's smoke-free, highly motivated, but under a lot of stress with strong cravings. Using the 5 As, how would you approach his plan to keep him smoke-free?",
+      must:["relapse","meds"],
       flag:{re:/5 ?rs|five rs|relevance|roadblock/i,msg:"The 5 Rs are for people who aren't ready to quit yet. Brian has already quit. What does he need now to stay quit?"},
       points:[
-        {id:"abst",label:"Assess: confirms he's abstinent (CO 4 ppm, action stage)",re:/abstin|smoke.?free|quit|non.?smok|4 ?ppm|\bco\b|action|confirm/i,ack:"Right, his CO of 4 confirms he's smoke-free.",
-          hints:["What does his CO of 4 ppm tell you?","Is he still smoking, or has he quit? Check the CO reference values in the Tobacco tab.","1–4 ppm is the normal range, even for non-smokers. What stage does that put him in?"]},
-        {id:"relapse",label:"Assist: relapse prevention (cravings, stress, triggers)",re:/relapse|crav|trigger|stress|cop/i,ack:"Yes, planning for stress and cravings is key.",
-          hints:["What's the biggest risk for him right now?","How would you help him handle cravings when the divorce gets hard?","A plan for stress and triggers would help prevent relapse."]},
+        {id:"relapse",label:"Assist: relapse prevention (cravings, stress, triggers)",re:/relapse|crav|trigger|stress|cop|5 ?d|delay|distract/i,ack:"Yes, planning for stress and cravings is key.",
+          hints:["What's the biggest risk for him right now?","How would you help him handle cravings when the divorce gets hard?","A plan for stress and triggers, like the 5 Ds, would help prevent relapse."]},
         {id:"meds",label:"Assist: continue varenicline, consider NRT for cravings",re:/varenicline|chantix|continue|12 ?weeks|nrt|gum|lozenge/i,ack:"Good, staying on his medicine is important.",
           hints:["What about his current cessation medicine?","Should he keep taking varenicline? For how long?","Continuing varenicline (and maybe short-acting NRT for cravings) supports him now."]},
         {id:"weight",label:"Addresses weight gain",re:/weight|diet|exercis|basketball/i,ack:"Nice that you picked up on the weight gain.",
@@ -454,10 +561,10 @@ brian: {
           hints:["What would you arrange after today?","When should we see him again?","A follow-up in 1 to 2 weeks and the quitline would cover Arrange."]}
       ],
       pass:"That's a solid plan to keep him smoke-free.",
-      share:"Here's a complete plan. Ask: confirm he's still smoke-free. Advise: praise his quit and link it to his kids and his gums. Assess: CO 4 ppm is in the normal range, which confirms abstinence; he's in the action stage with high motivation (9/10) but high relapse risk from stress. Assist: keep taking varenicline for the full course (an extra 12 weeks can help prevent relapse), consider short-acting NRT for cravings, plan for stress and triggers, and give tips on weight gain. Arrange: follow-up in 1 to 2 weeks plus the quitline.",
+      share:"Here's a complete plan. Ask: confirm he's still smoke-free. Advise: praise his quit and link it to his kids and his gums. Assess: CO 4 ppm confirms abstinence; he's highly motivated (9/10) but at high relapse risk from stress. Assist: keep taking varenicline for the full course (an extra 12 weeks can help prevent relapse), consider short-acting NRT for cravings, plan for stress and triggers with the 5 Ds, and give tips on weight gain. Arrange: follow-up in 1 to 2 weeks plus the quitline.",
       perspective:"I'll keep reinforcing his quit at each dental visit. His gums will heal better without smoking, which is a nice motivator."
     },
-    { text:"Write a brief joint summary plan for Brian's file.",
+    { step:3, label:"Joint plan", text:"Write a brief joint summary plan for Brian's file.",
       ask:"Let's wrap up. Can you write a brief joint summary plan for Brian's file, covering what pharmacy and dentistry will each do?",
       must:["pharm","dent","tob"],
       points:[
@@ -492,13 +599,13 @@ margaret: {
     ["Time to first cigarette","Within 30 minutes of waking",ttfcRef(1)],
     ["Fagerström score","<span class='abn'>7</span>",ftndRef(7)],
     ["Exhaled CO","<span class='abn'>20 ppm</span>",coRef(20)],
-    ["Readiness to quit","8 / 10",READY],
+    ["Readiness to quit","8 / 10",readyRef(8)],
     ["Past quit attempts","Quit 2000–2002 with nicotine gum 4 mg and 14 mg patches daily for 10 weeks; relapsed after her husband died",""],
     ["Triggers","After meals, with coffee, reading, gardening, before bed; smokes more when lonely",""]],
   intro:"Hi! I'm Maya Chen, the D2 dental student on Margaret's team. She came in with dry mouth, trouble swallowing and bad breath, and her dentures move when she eats and talks. Her oral tissues are inflamed from the poor fit. She says she's an 8/10 on readiness to quit. Is there anything you noticed as a student pharmacist to assess her needs?",
   reflectOn:"supporting an older adult who is ready to quit but has lost the support she had before",
   qs:[
-    { text:"Is there anything you noticed as a student pharmacist to assess Margaret's needs?",
+    { step:0, label:"Scope of practice", text:"Is there anything you noticed as a student pharmacist to assess Margaret's needs?",
       ask:null, must:["cause"], minMet:2,
       points:[
         {id:"cause",label:"Links dry mouth to her anticholinergic inhaler (Spiriva/tiotropium)",re:/anticholin|spiriva|tiotrop|(inhal|copd med|medicat)[^.]{0,60}(dry mouth|xerostom)|(dry mouth|xerostom)[^.]{0,60}(inhal|medicat|side effect)/i,ack:"Yes, her Spiriva could well be behind the dry mouth.",
@@ -519,7 +626,7 @@ margaret: {
         {t:"Dry mouth is a dental issue, so I'd leave that to you and focus only on her smoking.",best:false,why:"This is a common mistake. Her dry mouth is likely from her COPD inhaler, so pharmacy owns the medication review here."}
       ]
     },
-    { text:"If you are the first health professional to encounter Margaret, which referrals or consultations would you make? Name your top 3 and explain why.",
+    { step:1, label:"Referrals", text:"If you are the first health professional to encounter Margaret, which referrals or consultations would you make? Name your top 3 and explain why.",
       ask:"Next one. If you were the first health professional to see Margaret, which referrals or consultations would you make? Name your top 3 and tell me why.",
       must:["three","why"], minMet:4,
       points:[
@@ -541,15 +648,71 @@ margaret: {
         {t:"Top 3: dentistry, to refit her dentures and treat the inflamed tissue; pharmacy, to review her dry mouth from Spiriva and start cessation medicines while she's ready; and a counselor or social worker, because loneliness is a key trigger and she's lost the support she had last time.",best:true,why:"This is the strongest answer. Each referral targets a real need in her case, and every choice has a reason."}
       ]
     },
-    { text:"Based on Margaret's medical history, readiness to quit score and CO level, provide a smoking cessation treatment plan.",
-      ask:"She's an 8/10 on readiness, her CO is 20 ppm, her Fagerström score is 7 and she smokes within 30 minutes of waking. Using the 5 As, what's our smoking cessation treatment plan?",
-      must:["ready","depend","pharmaco"],
+    { step:2, part:"A", label:"Treatment plan · Part A: Fagerström score",
+      text:"Open the Tobacco tab. Margaret's Fagerström score is 7. What does that tell you about her nicotine dependence and her quit attempt?",
+      ask:"Let's work through her tobacco numbers together, one at a time. Pull up the Tobacco tab. First: her Fagerström score is 7. What does that tell you about her nicotine dependence and her quit attempt?",
+      must:["depend"],
+      points:[
+        {id:"depend",label:"Real nicotine dependence: 7 is in the moderate range (5–7) on the scale",re:/depend|addict|moderate|5 ?(-|–|to) ?7|high|physical/i,ack:"Right, a 7 shows real nicotine dependence.",
+          hints:["Check the Fagerström reference values in the Tobacco tab. Which band does 7 fall in?","On the scale, 5 to 7 is moderate dependence. What does that mean for her?","A 7 sits at the top of the moderate band. How dependent is she on nicotine?"]},
+        {id:"meds",label:"She'll likely need pharmacotherapy to manage cravings and withdrawal",re:/medic|nrt|patch|lozenge|pharmacotherap|varenicline|crav|withdraw/i,ack:"Good, that tells us medicine should be part of her plan.",
+          hints:["What does that level of dependence mean for her quit attempt?","Will willpower alone be enough at this level?","With moderate dependence, she'll likely need medicine to manage cravings."]}
+      ],
+      pass:"That's how I read it too.",
+      share:"A Fagerström score of 7 falls in the moderate dependence range (5 to 7), at the top of that band, and she smokes within 30 minutes of waking. She'll likely need pharmacotherapy to manage cravings and withdrawal.",
+      perspective:null,
+      options:[
+        {t:"A 7 means she's a heavy smoker, so she should cut down slowly first.",best:false,why:"The score measures nicotine dependence, not just how much she smokes, and cutting down alone isn't the plan for someone who's ready to quit."},
+        {t:"A 7 means she's dependent on nicotine.",best:false,why:"Right idea, but be specific: on the scale, 7 is moderate dependence (5 to 7), and it tells you she'll likely need medicine to quit."},
+        {t:"A 7 is in the moderate dependence range (5 to 7), at the top of that band, and she smokes within 30 minutes of waking. She'll likely need pharmacotherapy to manage cravings and withdrawal.",best:true,why:"This is the strongest answer. It reads the score against the scale and says what it means for her quit attempt."}
+      ]
+    },
+    { step:2, part:"B", label:"Treatment plan · Part B: CO level",
+      text:"Margaret's exhaled CO is 20 ppm. What does that tell you?",
+      ask:"Next number: her exhaled CO is 20 ppm. What does that tell you?",
+      must:["high"],
+      points:[
+        {id:"high",label:"CO 20 ppm is high (10+ ppm): she is smoking now or very recently",re:/high|elevat|above|over|10\+|abnormal|current|recent|active/i,ack:"Right, 20 ppm is in the high range, so she's actively smoking.",
+          hints:["Check the CO reference values in the Tobacco tab. Which range does 20 ppm fall in?","10 ppm and over is high. What does a reading of 20 say about her recent smoking?","20 ppm is far above the non-smoker cut-off of under 6. Is she smoking now?"]},
+        {id:"use",label:"Uses the CO reading as a baseline to track progress or motivate her",re:/track|monitor|progress|motivat|show her|feedback|baseline|compare|recheck|re-?test/i,ack:"Nice, it gives us a baseline to recheck after her quit date.",
+          hints:["Could the CO reading be useful later on?","How could you use this number after her quit date?","Rechecking CO after she quits can show her progress."]}
+      ],
+      pass:"Agreed.",
+      share:"A CO of 20 ppm is in the high range (10 ppm and over), which confirms she's smoking now. It's a useful baseline: we can recheck it after her quit date to show her progress.",
+      perspective:null,
+      options:[
+        {t:"20 ppm is normal for someone her age.",best:false,why:"CO doesn't depend on age. Anything 10 ppm and over is high and common in people who smoke."},
+        {t:"Her CO is high.",best:false,why:"Correct, but say what it means: 20 ppm confirms she's smoking now, and it gives you a baseline to recheck after her quit date."},
+        {t:"20 ppm is in the high range (10 ppm and over), which confirms she's smoking now. It's a useful baseline: we can recheck it after her quit date to show her progress.",best:true,why:"This is the strongest answer. It reads the number against the reference values and uses it in her care."}
+      ]
+    },
+    { step:2, part:"C", label:"Treatment plan · Part C: Readiness to quit",
+      text:"Margaret rates her readiness to quit as 8 out of 10. What does that tell you?",
+      ask:"Last number: she says she's an 8 out of 10 on readiness to quit. What does that tell you?",
+      must:["ready"],
+      points:[
+        {id:"ready",label:"Ready to quit (6–9 range, preparation stage): help her set a quit date",re:/ready|motivat|prepar|quit date|8/i,ack:"Yes, at 8/10 she's ready.",
+          hints:["Check the readiness reference values in the Tobacco tab. Where does 8 fall?","6 to 9 on the readiness ruler means ready to change. What would you do next?","At 8/10, would you help her set a quit date?"]},
+        {id:"support",label:"Not a 10 because she lost the support she had; build support into the plan",re:/support|lonel|husband|alone|not a 10|why not|friend|isolat/i,ack:"Good catch on why she isn't a 10.",
+          hints:["The scenario says why she isn't a 10. What is it?","She mentions what's different from the last time she quit. What's missing?","She doesn't have the support she had before. How would you address that?"]}
+      ],
+      pass:"Exactly how I'd read it.",
+      share:"8/10 is in the ready range (6 to 9), so she's ready to quit and we can help her set a quit date. She isn't a 10 because she doesn't have the support she had last time, so building support is part of the plan.",
+      perspective:null,
+      options:[
+        {t:"8/10 means she's still unsure, so we should wait.",best:false,why:"8 is in the ready range (6 to 9). Waiting could miss her window; she needs a quit date now."},
+        {t:"8/10 means she's ready to quit.",best:false,why:"Yes, and the case also tells you why she isn't a 10: she's lost the support she had. Addressing support is part of the plan."},
+        {t:"8/10 is in the ready range, so let's help her set a quit date. She isn't a 10 because she's lost the support she had last time, so we should build in support, like a counselor, social worker or the quitline.",best:true,why:"This is the strongest answer. It reads the score and uses the reason behind it."}
+      ]
+    },
+    { step:2, part:"D", label:"Treatment plan · Part D: Your approach",
+      text:"Based on these scores, how would you approach Margaret's treatment plan? She's ready to quit, so use the 5 As.",
+      ask:"Putting it together: a Fagerström of 7, CO of 20 ppm and 8/10 on readiness. Using the 5 As, how would you approach her treatment plan?",
+      must:["quitdate","pharmaco"],
       flag:{re:/5 ?rs|five rs|relevance|roadblock/i,unless:/nrt|patch|lozenge|varenicline|bupropion|inhaler/i,msg:"She's already an 8/10, so the 5 Rs (for people who aren't ready) might slow her down. What would help her quit now?"},
       points:[
-        {id:"ready",label:"Assess: motivated to quit (8/10), help her set a quit date",re:/ready|motivat|8 ?\/ ?10|8 out of 10|quit date|within (the next )?(30|two|2)/i,ack:"Yes, at 8/10 she's ready, so let's help her pick a quit date.",
-          hints:["What does her 8/10 tell you about timing?","Is she ready to quit in the next month?","With 8/10, would you help her set a quit date?"]},
-        {id:"depend",label:"Assess: physical dependence (first cigarette within 30 min, CO 20, Fagerström 7)",re:/fagerstr|depend|\b7\b|\bco\b|20 ?ppm|carbon monoxide|30 min|wak/i,ack:"Right, smoking within 30 minutes of waking shows physical dependence.",
-          hints:["What do her time to first cigarette and CO tell you?","Check the Tobacco tab. Where do her Fagerström score and CO fall on the reference values?","Smoking within 30 minutes of waking, a Fagerström of 7 and CO of 20 ppm all point to real nicotine dependence."]},
+        {id:"quitdate",label:"Assist: help her set a quit date (ideally within 2 weeks)",re:/quit date|set a date|quit day|within (the next )?(2|two) weeks|target date/i,ack:"Yes, a quit date gives her something concrete.",
+          hints:["She's ready. What's the first concrete step?","The 5 As handout says to set something within 2 weeks. What is it?","Would you help her pick a quit date?"]},
         {id:"pharmaco",label:"Assist: discusses pharmacotherapy options",re:/nrt|patch|lozenge|varenicline|chantix|bupropion|combination|medicat|pharmacotherap/i,ack:"Good, medicine will help with her cravings.",
           hints:["What could help her with cravings and withdrawal?","She used NRT before. What options would you discuss now?","Pharmacotherapy options like the patch, lozenge or varenicline could help."]},
         {id:"gum",label:"Avoids nicotine gum (no teeth, dentures)",re:/gum.{0,50}(denture|teeth|edentul)|(denture|teeth|edentul).{0,50}gum|avoid (nicotine )?gum|no gum|not gum/i,ack:"Nice catch: gum won't work with no teeth and loose dentures.",
@@ -568,11 +731,11 @@ margaret: {
       perspective:"I'll get her dentures refit so she can eat and speak comfortably, and I'll remind her that quitting will help her bad breath and taste.",
       options:[
         {t:"Since she's not completely sure, I'd use the 5 Rs and hold off on medicines.",best:false,why:"This is a common mistake. She's 8/10 and motivated, so she's ready. The 5 Rs fit someone ambivalent like Lucy. Margaret needs a quit date and pharmacotherapy now."},
-        {t:"She's motivated (8/10), so let's help her set a quit date. Smoking within 30 minutes of waking and a CO of 20 ppm show physical dependence. I'd build a 5 Ds trigger plan for meals, coffee, reading and gardening, and discuss pharmacotherapy, avoiding nicotine gum since she has no teeth and avoiding bupropion given her low appetite. Then I'd refer her to a cessation clinic or 1-800-QUIT-NOW.",best:true,why:"This is the strongest answer. It follows all 5 As, uses her numbers, and picks options that fit her teeth and appetite."},
+        {t:"She's motivated (8/10), so let's help her set a quit date within 2 weeks. Smoking within 30 minutes of waking, a Fagerström of 7 and a CO of 20 ppm show real dependence. I'd build a 5 Ds trigger plan for meals, coffee, reading and gardening, and discuss pharmacotherapy, avoiding nicotine gum since she has no teeth and avoiding bupropion given her low appetite. Then I'd refer her to a cessation clinic or 1-800-QUIT-NOW.",best:true,why:"This is the strongest answer. It follows all 5 As, uses her numbers, and picks options that fit her teeth and appetite."},
         {t:"She quit before with the gum and the patch, so I'd restart the same: 4 mg gum and 14 mg patches.",best:false,why:"Building on what worked is smart, but gum isn't an option now that she has no teeth and loose dentures. There's also no quit date, trigger plan or follow-up."}
       ]
     },
-    { text:"Write a brief joint summary plan for Margaret's file.",
+    { step:3, label:"Joint plan", text:"Write a brief joint summary plan for Margaret's file.",
       ask:"Let's wrap up. Can you write a brief joint summary plan for Margaret's file, covering what pharmacy and dentistry will each do?",
       must:["pharm","dent","tob"],
       points:[
@@ -602,6 +765,7 @@ margaret: {
    ===================================================================== */
 const FOOTNOTES = `<sup>1</sup> Fagerström Test for Nicotine Dependence: <a href="${LINKS.ftnd}" target="_blank" rel="noopener">aarc.org/…/Fagerstrom_test.pdf</a><br>
   <sup>2</sup> Exhaled carbon monoxide test: <a href="${LINKS.co}" target="_blank" rel="noopener">asthmaandlung.org.uk/…/exhaled-carbon-monoxide</a><br>
+  <sup>3</sup> Readiness ruler (CASAA, University of New Mexico): <a href="${LINKS.ready}" target="_blank" rel="noopener">casaa.unm.edu/…/readiness-ruler.pdf</a><br>
   Full scoring guides are in the IPE Resources tab.`;
 
 const RESOURCES_HTML = `
@@ -624,14 +788,25 @@ const RESOURCES_HTML = `
 <tr><td><b>Repetition</b></td><td>Revisit motivation at every visit. Remind them most people try several times before they quit for good.</td><td>"Can we talk about this again next time?"</td></tr>
 </tbody></table></div>
 
-<div class="panel"><div class="ph">The 5 Ds <span>Trigger plan for cravings</span></div>
-<table class="grid res"><tbody>
-<tr><td><b>Delay</b></td><td>Wait it out. Most cravings pass in a few minutes.</td></tr>
-<tr><td><b>Deep breathing</b></td><td>Take slow, deep breaths until the urge eases.</td></tr>
-<tr><td><b>Drink water</b></td><td>Sip water slowly.</td></tr>
-<tr><td><b>Do something else</b></td><td>Change the routine or keep hands and mind busy.</td></tr>
-<tr><td><b>Discuss</b></td><td>Talk to a friend, family member or the quitline.</td></tr>
-</tbody></table></div>
+<div class="panel"><div class="ph">The 5 Ds: a trigger plan for cravings <span><a href="${LINKS.fiveD}" target="_blank" rel="noopener">Source (RWJBarnabas Health)</a></span></div>
+<table class="grid res"><thead><tr><th>D</th><th>What the patient does when a craving hits</th></tr></thead><tbody>
+<tr><td><b>Delay</b></td><td>Put off smoking for as long as possible. Most cravings pass within a few minutes.</td></tr>
+<tr><td><b>Distract</b></td><td>Shift attention to something else, such as a walk, a snack or another activity.</td></tr>
+<tr><td><b>Deep breathe</b></td><td>Take slow, deep breaths (for example, box breathing) until the urge eases.</td></tr>
+<tr><td><b>Drink water</b></td><td>Sip water instead of smoking. Adding fruit or flavor can help.</td></tr>
+<tr><td><b>Discuss</b></td><td>Talk with friends, family or a quit coach (such as 1-800-QUIT-NOW) for support.</td></tr>
+</tbody></table>
+<div class="foot">Use the 5 Ds in the Assist step of the 5 As, matched to the patient's own triggers (for example, after meals or with coffee). Source: RWJBarnabas Health, "Manage Nicotine Craving with the 5 Ds of Quitting Technique" (2025).</div></div>
+
+<div class="panel"><div class="ph">Readiness to quit (readiness ruler) <span><a href="${LINKS.ready}" target="_blank" rel="noopener">Source (CASAA Readiness Ruler)</a></span></div>
+<div class="pb"><p>Ask: <i>"On a scale of 0 to 10, how ready are you to quit smoking in the next 30 days?"</i> The score tells you which path of the 5 As to take.</p></div>
+<table class="grid res"><thead><tr><th>Score</th><th>What it means</th><th>What to do</th></tr></thead><tbody>
+<tr><td><b>0–2</b></td><td>Not ready to change</td><td>Use the 5 Rs to build motivation. Keep the door open and ask again at the next visit.</td></tr>
+<tr><td><b>3–5</b></td><td>Unsure (ambivalent, the contemplation stage)</td><td>Use the 5 Rs and explore both sides: "Why a 5 and not a 2?" Don't push a quit date yet.</td></tr>
+<tr><td><b>6–9</b></td><td>Ready to change (preparation)</td><td>Assist: set a quit date within 2 weeks, discuss medicines and a trigger plan. Ask "What would make it a 10?"</td></tr>
+<tr><td><b>10</b></td><td>Already trying to change (action)</td><td>Support the quit attempt and prevent relapse. Arrange follow-up.</td></tr>
+</tbody></table>
+<div class="foot">Score bands follow the anchors on the CASAA Readiness Ruler (not ready, unsure, ready, trying), which is based on Miller and Rollnick's motivational interviewing. In Brian's case the same scale rates his motivation to stay quit.</div></div>
 
 <div class="panel"><div class="ph">Fagerström Test for Nicotine Dependence <span><a href="${LINKS.ftnd}" target="_blank" rel="noopener">Source (AARC)</a></span></div>
 <table class="grid res"><thead><tr><th>Question</th><th>Answer and points</th></tr></thead><tbody>
@@ -652,11 +827,7 @@ const RESOURCES_HTML = `
 </tbody></table>
 <div class="foot">The case sheets use &lt;6 ppm as the non-smoker cut-off.</div></div>`;
 
-const REFLECT = (name) => [
-  `How did you choose your top 3 referrals, and did the dental student's perspective shift your initial thoughts?`,
-  `Where could your communication or therapeutic reasoning regarding ${name}'s nicotine dependence have been strengthened?`,
-  `How does this simulated chat mirror real-world professional team-based challenges?`
-];
+// Reflection questions are set up in Canvas, so they are no longer shown here.
 
 /* =====================================================================
    STATE
@@ -673,7 +844,7 @@ function st(id){
     S[id] = {started:false, ended:false, q:0, tries:Array(n).fill(0), hint:Array(n).fill(0),
              met:Array.from({length:n},()=>({})), via:Array(n).fill(null), closed:Array(n).fill(false),
              awaiting:false, picked:Array(n).fill(null), log:[], el, guideShown:false, rubricShown:false,
-             hintsUsed:0, qtext:Array(n).fill("")};
+             hintsUsed:0, qtext:Array(n).fill(""), hl:[]};
   }
   return S[id];
 }
@@ -689,7 +860,7 @@ function toast(t){ const d=document.createElement("div"); d.className="toast"; d
 function scrollChat(){ const m=$("msgs"); m.scrollTop = m.scrollHeight; }
 
 function push(id, msg){
-  const s = st(id); msg.time = msg.time || now(); s.log.push(msg);
+  const s = st(id); msg.time = msg.time || now(); if(msg.q==null) msg.q = s.q; s.log.push(msg);
   let el;
   if(msg.type==="sys"){ el=document.createElement("div"); el.className="sys"; el.textContent=msg.text; }
   else if(msg.type==="div"){ el=document.createElement("div"); el.className="div"; el.id=`${id}-div-${msg.q}`; el.textContent=msg.text; }
@@ -730,37 +901,51 @@ function qStatus(id, qi){
   if(cnt>0) return "partly";
   return s.closed[qi] || qi<s.q ? "not" : "none";
 }
+const stepOf = (Q) => STEPS[Q.step];
+const qTag = (Q) => `${STEPS[Q.step].k}${Q.part ? Q.part.toLowerCase() : ""}`;
+const qName = (Q) => Q.label || STEPS[Q.step].label;
+const firstOfStep = (C, k) => C.qs.findIndex(Q => Q.step===k);
 const PILL = {met:["met","Met"], partly:["partly","Partly met"], not:["not","Not yet"], none:["none","Not reached"]};
-const VIA = {own:"In your own words", shared:"Maya shared the full answer", sample:"Compared with sample answers"};
+function alignment(id, i){
+  const C=CASES[id], s=st(id), Q=C.qs[i], status=qStatus(id,i);
+  const got=Q.points.filter(p=>s.met[i][p.id]).length, total=Q.points.length;
+  let txt;
+  if(status==="none") return {lvl:"none", txt:"Not reached"};
+  if(status==="met") txt = got===total ? "Strongly aligned with the rubric. You covered every point in your own words."
+                                       : `Strongly aligned with the rubric. You covered all key points in your own words (${got} of ${total} points).`;
+  else if(status==="partly") txt = `Moderately aligned with the rubric. You covered ${got} of ${total} points, but missed at least one key point. ${C.practice?"Review the strongest example answer.":"Review Maya's complete answer in the chat."}`;
+  else txt = `Weakly aligned with the rubric. The key points were missed. ${C.practice?"Review the strongest example answer.":"Review Maya's complete answer in the chat."}`;
+  if(s.picked[i]!=null) txt += Q.options[s.picked[i]].best ? " You then picked the strongest example answer." : " You then picked an example answer that missed key points.";
+  return {lvl: status==="met"?"strong":status==="partly"?"moderate":"weak", txt};
+}
 
 function rubricTable(id){
   const C=CASES[id], s=st(id);
   let rows = C.qs.map((Q,i)=>{
     const p = PILL[qStatus(id,i)];
     const pts = Q.points.map(pt=>`<span class="pt ${s.met[i][pt.id]?"y":"n"}">${s.met[i][pt.id]?"✓":"○"} ${esc(pt.label)}${Q.must.includes(pt.id)?" *":""}</span>`).join("");
-    let how = s.via[i] ? VIA[s.via[i]] : "";
-    if(s.picked[i]!=null){ const o=Q.options[s.picked[i]]; how += how?" · ":""; how += o.best ? "Picked the strongest sample" : "Picked a weaker sample"; }
-    return `<tr><td><b>${STEPS[i].k}</b><br><span style="color:var(--e-sub)">${STEPS[i].label}</span></td><td><span class="pill ${p[0]}">${p[1]}</span></td><td><div class="pts">${pts}</div></td><td style="color:var(--e-sub)">${how||"–"}</td></tr>`;
+    const a = alignment(id,i);
+    return `<tr><td style="width:130px"><b>${qTag(Q)}</b><br><span style="color:var(--e-sub)">${esc(qName(Q))}</span></td><td style="width:210px"><span class="pill ${p[0]}">${p[1]}</span><div class="sub" style="margin-top:4px;font-size:11.5px;line-height:1.4">${esc(a.txt)}</div></td><td><div class="pts">${pts}</div></td></tr>`;
   }).join("");
-  return `<table class="grid"><thead><tr><th>Question</th><th>Result</th><th>Rubric points (* = key point)</th><th>How</th></tr></thead><tbody>${rows}</tbody></table>`;
+  return `<table class="grid"><thead><tr><th>Question</th><th>Result and rubric alignment</th><th>Rubric points (* = key point)</th></tr></thead><tbody>${rows}</tbody></table>`;
 }
 
 function feedbackText(id){
   const C=CASES[id], s=st(id);
   const statuses = C.qs.map((_,i)=>qStatus(id,i));
-  const strong = statuses.filter(x=>x==="met").length>=3;
+  const strong = statuses.filter(x=>x==="met").length >= Math.ceil(C.qs.length*0.7);
   const did=[], miss=[];
   const extra=[];
   C.qs.forEach((Q,i)=>Q.points.forEach(pt=>{ if(s.met[i][pt.id]) did.push(pt.label); else if(Q.must.includes(pt.id)) miss.push(pt.label); else extra.push(pt.label); }));
   miss.push(...extra);
-  const lc = (t)=>t.charAt(0).toLowerCase()+t.slice(1);
+  const lc = (t)=> /^[A-Z][a-z]/.test(t) ? t.charAt(0).toLowerCase()+t.slice(1) : t;
   const didTxt = did.length ? did.slice(0,3).map(lc).join("; ") : "the start of the conversation";
   const missTxt = miss.length ? lc(miss[0]) : "adding even more case-specific detail, such as exact scores and follow-up timing";
   return `Your clinical justification demonstrated a ${strong?"strong":"developing"} understanding of interprofessional collaboration. You addressed ${didTxt}. To improve, consider focusing more on ${missTxt}. Reflect on how this case mirrors the real-world challenge of ${C.reflectOn}.`;
 }
 
 /* =====================================================================
-   PRACTICE ENGINE (stand-in for Claude)
+   PRACTICE ENGINE (offline stand-in for Claude, and the backup if Claude is unreachable)
    ===================================================================== */
 function pointHit(p, text){
   if(p.count) return p.count.filter(r=>r.test(text)).length >= p.min;
@@ -789,7 +974,7 @@ async function practiceTurn(id, text){
   if(s.tries[qi] >= CONFIG.maxTries){
     const lead = [acks, flagged?Q.flag.msg:""].filter(Boolean).join(" ");
     if(C.practice){
-      await maya(id,[ (lead?lead+" ":"") + "Let's compare with some sample answers so you can see what a complete response looks like." ]);
+      await maya(id,[ (lead?lead+" ":"") + "Let's compare some example answers so you can see what a complete response looks like." ]);
       return showOptions(id, false);
     }
     await maya(id,[ (lead?lead+" ":"") + "Thanks for working through that with me. Let me share what I'd want to see.", {type:"share", text:Q.share} ]);
@@ -807,25 +992,51 @@ async function practiceTurn(id, text){
   await maya(id,[reply]);
 }
 
-/* Live Claude engine: used only when CONFIG.engine === "claude".
-   The server function adds the system prompt (Maya, case, rubric) and the API key,
-   then returns JSON: {maya_reply, rubric:[{point,result}], accuracy, hint_level, advance}. */
+/* Live Claude engine: used when CONFIG.engine === "claude".
+   The page sends the student's message to the Netlify function (CONFIG.apiUrl).
+   The function adds Maya's instructions, the case and the rubric, calls Claude with the
+   secret API key, and returns JSON: {maya_reply, points_met:[ids], accuracy, off_topic}.
+   The page keeps control of the flow (tries, hints, example answers, results). */
 async function claudeTurn(id, text){
-  const s=st(id);
+  const C=CASES[id], s=st(id), qi=s.q, Q=C.qs[qi];
+  const valid = new Set(Q.points.map(p=>p.id));
+  const transcript = s.log.filter(m=>m.q===qi && ["me","maya","hint"].includes(m.type))
+    .map(m=>(m.type==="me"?"Student":"Maya")+": "+m.text).join("\n").slice(-6000);
+  let j;
+  const typing = document.createElement("div"); typing.className="typing"; typing.textContent=`${CONFIG.botName.split(" ")[0]} is typing…`;
+  s.el.appendChild(typing); if(id===cur) scrollChat();
+  busy = true; syncCompose();
   try{
-    const r = await fetch(CONFIG.apiUrl,{method:"POST",headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({caseId:id, question:s.q, tries:s.tries[s.q], history:s.log.filter(m=>m.type==="me"||m.type==="maya").slice(-12).map(m=>({role:m.type==="me"?"user":"assistant",content:m.text})), message:text})});
-    const j = await r.json();
-    s.tries[s.q]++;
-    (j.rubric||[]).forEach(p=>{ if(p.result==="met") s.met[s.q][p.point]=true; });
-    await maya(id,[j.maya_reply]);
-    if(j.advance) return closeQuestion(id, "own");
-    if(s.tries[s.q]>=CONFIG.maxTries){ if(CASES[id].practice) return showOptions(id,false); await maya(id,[{type:"share",text:CASES[id].qs[s.q].share}]); return closeQuestion(id,"shared"); }
+    const ctrl = new AbortController(); const timer = setTimeout(()=>ctrl.abort(), 30000);
+    const r = await fetch(CONFIG.apiUrl,{method:"POST",headers:{"Content-Type":"application/json"},signal:ctrl.signal,
+      body:JSON.stringify({caseId:id, q:qi, tries:s.tries[qi], maxTries:CONFIG.maxTries,
+        alreadyMet:Object.keys(s.met[qi]), transcript, message:text})});
+    clearTimeout(timer);
+    if(!r.ok) throw new Error("HTTP "+r.status);
+    j = await r.json();
+    if(typeof j.maya_reply!=="string" || !j.maya_reply.trim()) throw new Error("Bad reply");
   }catch(e){
-    push(id,{type:"sys",text:"Couldn't reach Maya. Switching to the practice engine."});
-    CONFIG.engine="practice"; $("engine-badge").textContent="Practice engine · no AI";
+    typing.remove(); busy=false;
+    console.warn("Claude engine error:", e);
+    // Answer this one message with the practice engine; the next message tries Claude again.
+    if(!s.dropNoted){ s.dropNoted=true; push(id,{type:"sys",text:"Maya's connection dropped, so the practice engine answered this message. Keep going as normal."}); }
+    $("engine-badge").textContent="Live: Claude (reconnecting)";
     return practiceTurn(id,text);
   }
+  typing.remove(); busy=false;
+  $("engine-badge").textContent="Live: Claude";
+  s.tries[qi]++;
+  s.qtext[qi] += " " + text;
+  (j.points_met||[]).forEach(pid=>{ if(valid.has(pid)) s.met[qi][pid]=true; });
+  const cnt=Object.keys(s.met[qi]).length;
+  const pass = Q.must.every(k=>s.met[qi][k]) && (!Q.minMet || cnt>=Q.minMet);
+  if(pass){ await maya(id,[j.maya_reply]); return closeQuestion(id,"own"); }
+  if(s.tries[qi] >= CONFIG.maxTries){
+    if(C.practice){ await maya(id,[j.maya_reply]); return showOptions(id,false); }
+    await maya(id,[j.maya_reply, {type:"share", text:Q.share}]);
+    return closeQuestion(id,"shared");
+  }
+  await maya(id,[j.maya_reply]);
 }
 
 /* =====================================================================
@@ -833,15 +1044,28 @@ async function claudeTurn(id, text){
    ===================================================================== */
 function guideHtml(withStart){
   return `<h4>How this works</h4>
+  <div class="rules"><b>Rules for this simulation</b><ul>
+    <li><b>Enter</b> sends your message. Use <b>Shift + Enter</b> to add a new line.</li>
+    <li><b>Do not refresh or close this page.</b> You will lose your chat and highlights. Copy your chat before you leave.</li>
+    <li>Move from <b>left to right</b>: the patient summary, then each chart tab, then the chat.</li>
+    <li><b>Highlight the main problems</b> as you read through the case.</li>
+  </ul></div>
   <ol class="guide">
-    <li><span><b>Read the chart.</b> The left column and the chart tabs have everything about the patient.</span></li>
+    <li><span><b>Read the chart, left to right.</b> Start with the patient summary on the left, then open each tab in turn: Chart Review, Patient Info, Medications and Tobacco. IPE Resources explains each question and has the 5 As, 5 Rs, 5 Ds and score guides.</span></li>
+    <li><span><b>Highlight the main problems.</b> Use the highlight feature in the chart to mark the patient's main problems as you read. These problems drive your referrals and your treatment plan, and students who do this well usually score higher.</span></li>
     <li><span><b>Start the simulation.</b> Maya, a D2 dental student, will message you about your shared patient.</span></li>
-    <li><span><b>Answer 4 questions in your own words:</b> Q1 Scope of practice, Q2 Referrals, Q3 Treatment plan, Q4 Joint plan. The timeline above shows where you are.</span></li>
-    <li><span><b>Stuck? Ask Maya for a hint.</b> You have ${CONFIG.maxHints} hints per case. They're free and don't affect your result. The IPE Resources tab has the 5 As, 5 Rs and score guides.</span></li>
-    <li><span><b>Up to ${CONFIG.maxTries} tries per question.</b> If something's missing after that, Maya shows you what a complete answer looks like${CASES[cur].practice?" (in this practice case you'll compare sample answers)":""}.</span></li>
+    <li><span><b>Answer 4 questions in your own words:</b> Q1 Scope of practice, Q2 Referrals, Q3 Treatment plan (4 short parts: dependence, CO level, readiness, then your approach) and Q4 Joint plan. The timeline above shows where you are.</span></li>
+    <li><span><b>Stuck? Ask Maya for a hint.</b> You have ${CONFIG.maxHints} hints per case. They're free and don't affect your result.</span></li>
+    <li><span><b>Up to ${CONFIG.maxTries} tries per question.</b> If something's missing after that, Maya shows you what a complete answer looks like${CASES[cur].practice?" (in this practice case you'll compare example answers)":""}.</span></li>
     <li><span><b>See your results and copy your chat.</b> Rubric results appear after the joint plan. Click End Simulation for feedback, then copy your chat into your assignment.</span></li>
   </ol>
   ${withStart?`<div class="row"><button class="btn pri" type="button" data-start>Start Simulation</button></div>`:""}`;
+}
+
+function divText(Q, newStep){
+  const base = `${STEPS[Q.step].k} · ${STEPS[Q.step].label}`;
+  if(!Q.part) return base;
+  return `${base} · Part ${Q.part}: ${Q.label.split(": ").pop()}`;
 }
 
 async function startSim(id){
@@ -849,7 +1073,7 @@ async function startSim(id){
   s.started=true;
   [...s.el.querySelectorAll("[data-start]")].forEach(b=>b.disabled=true);
   push(id,{type:"sys",text:`Simulation started ${now()}`});
-  push(id,{type:"div",q:0,text:`Q1 · ${STEPS[0].label}`});
+  push(id,{type:"div",q:0,text:divText(CASES[id].qs[0], true)});
   renderAll();
   await maya(id,[CASES[id].intro]);
   $("input").focus();
@@ -867,7 +1091,8 @@ async function afterQuestion(id){
   if(Q.perspective) await maya(id,[Q.perspective]);
   if(qi < C.qs.length-1){
     s.q++;
-    push(id,{type:"div",q:s.q,text:`${STEPS[s.q].k} · ${STEPS[s.q].label}`});
+    const nq=C.qs[s.q], newStep = nq.step!==C.qs[s.q-1].step;
+    push(id,{type:"div",q:s.q,text:divText(nq, newStep)});
     renderAll();
     await maya(id,[C.qs[s.q].ask]);
   } else {
@@ -881,7 +1106,7 @@ function showRubricCard(id){
   const s=st(id); if(s.rubricShown) return; s.rubricShown=true;
   const C=CASES[id], s2=st(id);
   const rows = C.qs.map((Q,i)=>{ const p=PILL[qStatus(id,i)], got=Q.points.filter(pt=>s2.met[i][pt.id]).length;
-    return `<tr><td><b>${STEPS[i].k}</b> ${STEPS[i].label}</td><td><span class="pill ${p[0]}">${p[1]}</span></td><td style="color:var(--e-sub)">${got} of ${Q.points.length} points</td></tr>`; }).join("");
+    return `<tr><td><b>${qTag(Q)}</b> ${esc(qName(Q))}</td><td><span class="pill ${p[0]}">${p[1]}</span></td><td style="color:var(--e-sub)">${got} of ${Q.points.length} points</td></tr>`; }).join("");
   const html = `<h4>Your rubric results</h4><table class="grid"><tbody>${rows}</tbody></table>
     <p style="color:var(--e-sub)">The point-by-point breakdown is in the Feedback tab after you end the simulation.</p>
     <p>When you're ready, click <b>End Simulation</b> for your feedback and to copy your chat.</p>`;
@@ -893,12 +1118,12 @@ function showOptions(id, optional){
   s.awaiting=true; syncCompose();
   const qi=s.q;
   const opts = Q.options.map((o,i)=>`<button type="button" class="opt" data-opt="${i}" data-q="${qi}"><b>${i+1}</b><span>${esc(o.t)}</span></button>`).join("");
-  const html = `<h4>${optional?"Nice work. Want to compare with sample answers?":"Compare with sample answers"}</h4>
+  const html = `<h4>${optional?"Nice work. Want to compare with example answers?":"Compare with example answers"}</h4>
     <p style="color:var(--e-sub)">Which response would you send to Maya? Pick one to see her take.</p>
     <div style="display:grid;gap:6px">${opts}</div>
     ${optional?`<div class="row"><button class="btn" type="button" data-skip="${qi}">Skip and move on</button></div>`:""}`;
   if(!s.via[qi]) { s.via[qi]="sample"; s.closed[qi]=true; }
-  push(id,{type:"card",html,text:"[Sample answers shown]"});
+  push(id,{type:"card",html,text:"[Example answers shown]"});
   renderAll();
 }
 
@@ -927,7 +1152,7 @@ async function giveHint(){
   const id=cur, s=st(id);
   if(!s.started){ toast("Start the simulation first"); return; }
   if(s.ended){ toast("The simulation has ended"); return; }
-  if(s.awaiting){ toast("Pick a sample answer above, or skip"); return; }
+  if(s.awaiting){ toast("Pick an example answer above, or skip"); return; }
   if(s.q>=CASES[id].qs.length){ toast("All questions are done. Click End Simulation for feedback"); return; }
   if(busy) return;
   if(s.hintsUsed >= CONFIG.maxHints){ toast(`You've used all ${CONFIG.maxHints} hints for this case`); return; }
@@ -960,7 +1185,7 @@ async function send(){
   if(/^end simulation$/i.test(text)){ box.value=""; return endSim(id); }
   if(!s.started){ toast("Click Start Simulation first"); return; }
   if(s.ended){ toast("The simulation has ended"); return; }
-  if(s.awaiting){ toast("Pick a sample answer above, or skip"); return; }
+  if(s.awaiting){ toast("Pick an example answer above, or skip"); return; }
   box.value="";
   push(id,{type:"me",text});
   if(s.q>=CASES[id].qs.length){ await maya(id,["Thanks! Whenever you're ready, click End Simulation and I'll give you feedback."]); return; }
@@ -984,10 +1209,10 @@ function transcript(id){
     else if(m.type==="maya") lines.push(`[${m.time}] ${CONFIG.botName}: ${m.text}`);
   });
   lines.push("", "--- Rubric results ---");
-  C.qs.forEach((Q,i)=>{ lines.push(`${STEPS[i].k} ${STEPS[i].label}: ${PILL[qStatus(id,i)][1]}`); });
+  C.qs.forEach((Q,i)=>{ const a=alignment(id,i); lines.push(`${qTag(Q)} ${qName(Q)}: ${PILL[qStatus(id,i)][1]}. ${a.lvl==="none"?"":a.txt}`.trim()); });
   if(s.ended){ lines.push("", "--- Feedback ---", feedbackText(id)); }
-  lines.push("", "--- Reflection questions ---");
-  REFLECT(C.tab).forEach((q,i)=>lines.push(`${i+1}. ${q}`, ""));
+  const hl = highlightList(id);
+  if(hl.length){ lines.push("", "--- Problems I highlighted in the chart ---"); hl.forEach(t=>lines.push("- "+t)); }
   return lines.join("\n");
 }
 
@@ -1020,60 +1245,155 @@ function renderStory(){
     <div><div class="pname">${C.tab}</div><div class="pmeta">${C.age} · MRN ${C.mrn}</div></div>
     <div class="sb"><span class="sbl">Allergies</span><span class="allergy">Not listed in case</span></div>
     <div class="sb"><span class="sbl">Flags</span><div>${C.flags.map(f=>`<span class="flag ${f[1]}">${f[0]}</span>`).join("")}</div></div>
-    <div class="sb"><span class="sbl">Problems</span>${C.problems.map(p=>`<span>${p}</span>`).join("")}</div>
-    <div class="sb"><span class="sbl">Tobacco</span>${C.tobacco.map(p=>`<span>${p}</span>`).join("")}</div>
+    <div class="sb"><span class="sbl">Problems</span>${C.problems.map((p,i)=>`<span data-hlk="sb-p${i}">${p}</span>`).join("")}</div>
+    <div class="sb"><span class="sbl">Tobacco</span>${C.tobacco.map((p,i)=>`<span data-hlk="sb-t${i}">${p}</span>`).join("")}</div>
     <div class="sb"><span class="sbl">Care team</span><span>${CONFIG.botName}, D2</span><span>You, PharmD student</span></div>`;
+  applyHighlights($("story"));
 }
 
 function bannerHtml(){
   const C=CASES[cur], s=st(cur);
   let title, q, btns="";
-  if(!s.started){ title="Simulation not started"; q=`Read ${C.tab}'s chart, then click Start Simulation in the chat.`; btns=`<button class="btn pri" type="button" data-start>Start Simulation</button><button class="btn" type="button" data-guide>How it works</button>`; }
-  else if(s.ended){ title="Simulation ended"; q="Your feedback and rubric results are ready. Copy your chat for your assignment reflection."; btns=`<button class="btn pri" type="button" data-copy>Copy chat and feedback</button>`; }
+  if(!s.started){ title="Simulation not started"; q=`Read ${C.tab}'s chart from left to right and highlight the main problems, then click Start Simulation.`; btns=`<button class="btn pri" type="button" data-start>Start Simulation</button><button class="btn" type="button" data-guide>How it works</button>`; }
+  else if(s.ended){ title="Simulation ended"; q="Your feedback and rubric results are ready. Copy your chat for your assignment."; btns=`<button class="btn pri" type="button" data-copy>Copy chat and feedback</button>`; }
   else if(s.q>=C.qs.length){ title="All 4 questions done"; q="Review your rubric results in the chat, then click End Simulation for feedback."; btns=`<button class="btn pri" type="button" data-end>End Simulation</button>`; }
-  else { title=`IPE question ${s.q+1} of ${C.qs.length} · ${STEPS[s.q].label}`; q=C.qs[s.q].text; btns=`<button class="btn hint" type="button" data-hint>Ask Maya for a hint (${Math.max(0,CONFIG.maxHints-s.hintsUsed)} left)</button><span style="font-size:11.5px;color:var(--e-sub)">Try ${Math.min(s.tries[s.q]+1,CONFIG.maxTries)} of ${CONFIG.maxTries}</span>`; }
+  else { const Q=C.qs[s.q]; title=`IPE question ${Q.step+1} of 4 · ${qName(Q)}`; q=Q.text; btns=`<button class="btn hint" type="button" data-hint>Ask Maya for a hint (${Math.max(0,CONFIG.maxHints-s.hintsUsed)} left)</button><span style="font-size:11.5px;color:var(--e-sub)">Try ${Math.min(s.tries[s.q]+1,CONFIG.maxTries)} of ${CONFIG.maxTries}</span>`; }
   return `<div class="bpa"><span class="t">${title}</span><span class="q">${esc(q)}</span><div class="row">${btns}</div></div>`;
+}
+
+/* =====================================================================
+   HIGHLIGHTER: students select chart text and mark the main problems in yellow.
+   Highlights are saved per case as {key, start, end} inside [data-hlk] blocks,
+   so they survive switching tabs. They are listed in the copied chat.
+   ===================================================================== */
+let hlSeq = 0;
+function highlightBar(){
+  const n = st(cur).hl.length;
+  return `<div class="hlbar"><span><span class="sw"></span><b>Highlighter:</b> select text in the chart, then click <b>Highlight</b> to mark ${CASES[cur].tab}'s main problems. Click a highlight to remove it.</span><span class="sp"></span><span>${n} highlighted</span>${n?`<button class="btn" type="button" data-hl-clear>Clear all</button>`:""}</div>`;
+}
+function highlightList(id){
+  const seen=new Set(), out=[];
+  st(id).hl.forEach(h=>{ const t=h.text.replace(/\s+/g," ").trim(); if(t && !seen.has(t.toLowerCase())){ seen.add(t.toLowerCase()); out.push(t); } });
+  return out;
+}
+function wrapRange(el, start, end, hid){
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes=[]; let pos=0, n;
+  while((n=walker.nextNode())){ const len=n.nodeValue.length; if(pos+len>start && pos<end) nodes.push([n,pos]); pos+=len; }
+  nodes.forEach(([node,p0])=>{
+    const a=Math.max(start-p0,0), b=Math.min(end-p0,node.nodeValue.length);
+    if(b<=a) return;
+    let mid=node;
+    if(a>0) mid=node.splitText(a);
+    if(b-a < mid.nodeValue.length) mid.splitText(b-a);
+    if(!mid.nodeValue.trim()) return;
+    const m=document.createElement("mark"); m.className="hl"; m.dataset.hid=hid; m.title="Click to remove this highlight";
+    mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
+  });
+}
+function applyHighlights(root){
+  st(cur).hl.forEach(h=>{ const el=root.querySelector(`[data-hlk="${h.key}"]`); if(el) wrapRange(el,h.start,h.end,h.id); });
+}
+function offsetIn(el, container, offset){
+  const r=document.createRange(); r.setStart(el,0); r.setEnd(container,offset); return r.toString().length;
+}
+function addHighlightFromSelection(){
+  const sel=window.getSelection(); if(!sel || sel.isCollapsed || !sel.rangeCount) return false;
+  const range=sel.getRangeAt(0); let added=0;
+  document.querySelectorAll("#work [data-hlk], #story [data-hlk]").forEach(el=>{
+    if(!range.intersectsNode(el)) return;
+    const start = el.contains(range.startContainer) ? offsetIn(el, range.startContainer, range.startOffset) : 0;
+    const end = el.contains(range.endContainer) ? offsetIn(el, range.endContainer, range.endOffset) : el.textContent.length;
+    const text = el.textContent.slice(start,end);
+    if(end>start && text.trim()){ st(cur).hl.push({id:++hlSeq, key:el.dataset.hlk, start, end, text}); added++; }
+  });
+  sel.removeAllRanges();
+  if(added){ renderStory(); renderWork(); }
+  return added>0;
+}
+function removeHighlight(hid){
+  const s=st(cur); s.hl = s.hl.filter(h=>String(h.id)!==String(hid)); renderStory(); renderWork();
+}
+function selectionInChart(){
+  const sel=window.getSelection(); if(!sel || sel.isCollapsed || !sel.rangeCount) return false;
+  const r=sel.getRangeAt(0);
+  return [...document.querySelectorAll("#work [data-hlk], #story [data-hlk]")].some(el=>r.intersectsNode(el));
+}
+
+function qGuideHtml(C, s){
+  const part = (k)=>C.qs.filter(Q=>Q.step===k);
+  const status = (k)=>{
+    const idx=C.qs.map((Q,i)=>Q.step===k?i:-1).filter(i=>i>=0);
+    if(!s.started) return "Not started";
+    if(idx.every(i=>s.closed[i]||i<s.q)) return "Done";
+    if(idx.includes(s.q) && !s.ended) return "In progress";
+    return s.ended ? "Not reached" : "Coming up";
+  };
+  const q3 = part(2).map(Q=>`<li><b>Part ${Q.part}:</b> ${esc(Q.text.replace(/^Open the Tobacco tab\. /,""))}</li>`).join("");
+  const row = (k, what, look, strong) => `<tr><td><b>${STEPS[k].k} · ${STEPS[k].label}</b><br><span class="sub">${status(k)}</span></td><td>${what}<br><span class="sub"><b>Where to look:</b> ${look}</span><br><span class="sub"><b>A strong answer:</b> ${strong}</span></td></tr>`;
+  return `<div class="panel"><div class="ph">Your IPE questions: what each one asks <span>${C.tab} · read before you start</span></div>
+  <table class="grid res qguide"><tbody>
+  ${row(0, `<b>The question:</b> ${esc(part(0)[0].text)}<br>Maya wants to know what <b>you, as a student pharmacist,</b> can spot and do for this patient. Think about medicines, side effects, inhaler or dosing technique, adherence and counseling.`,
+     "Medications tab and Patient Info (drug history, medical history).",
+     "names a specific medication issue, links it to the patient's complaint, and says what you would do about it. Maya then shares the dental side.")}
+  ${row(1, `<b>The question:</b> ${esc(part(1)[0].text)}<br>Choose the <b>3 referrals or consultations</b> that would help most, and give a reason for each. No ranking is needed.`,
+     "the problems you highlighted, plus the social and medical history in Patient Info.",
+     "each referral matches a real problem in the case (for example dental, pharmacy, counseling or social work) and has a clear reason.")}
+  ${row(2, `Q3 has <b>4 short parts</b>. Answer them one at a time:<ul>${q3}</ul>`,
+     "the Tobacco tab (use the Reference values column) and IPE Resources (5 As, 5 Rs, 5 Ds, readiness ruler).",
+     "reads each number against its reference values, says what it means for this patient, then builds a plan that fits how ready they are (5 As, and the 5 Rs if they aren't ready).")}
+  ${row(3, `<b>The question:</b> ${esc(part(3)[0].text)}<br>Write a short note for the chart that both of you agree on.`,
+     "your answers to Q1 to Q3 and Maya's dental input.",
+     "says what pharmacy will do, what dentistry will do, who else you'll refer to, the tobacco plan, and when you'll follow up.")}
+  </tbody></table>
+  <div class="foot">How you're assessed: each question has key points from the faculty rubric. You get up to ${CONFIG.maxTries} tries per question and ${CONFIG.maxHints} hints per case. Your results appear after the joint plan and again when you end the simulation.</div></div>`;
 }
 
 function renderWork(){
   const C=CASES[cur], s=st(cur);
   document.querySelectorAll("#acts button").forEach(b=>{ b.classList.toggle("on", b.dataset.view===view); if(b.dataset.view==="feedback") b.hidden=!s.ended; });
   let body="";
+  const chartViews = ["chart","info","meds","tobacco"];
   if(view==="chart"){
-    body = `<div class="panel"><div class="ph">Chart Review · Today's visit <span>Scenario</span></div><div class="pb"><p>${esc(C.scenario)}</p></div></div>
-      <div class="panel"><div class="ph">Encounters <span>Last 12 months</span></div><div style="overflow-x:auto"><table class="grid"><thead><tr><th>Date</th><th>Type</th><th>Department</th><th>Provider</th><th>Description</th></tr></thead><tbody>${C.encounters.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
+    const hl = highlightList(cur);
+    body = `<div class="panel"><div class="ph">Chart Review · Today's visit <span>Scenario</span></div><div class="pb"><p data-hlk="scn">${esc(C.scenario)}</p></div></div>
+      <div class="panel"><div class="ph">Main problems you've highlighted <span>${hl.length} so far</span></div><div class="pb">${hl.length?`<div class="hlchips">${hl.map(t=>`<span class="hlchip">${esc(t)}</span>`).join("")}</div>`:`<p class="sub">Nothing highlighted yet. Select text in the scenario, Patient Info, Medications or Tobacco tabs and click Highlight.</p>`}</div></div>
+      <div class="panel"><div class="ph">Encounters <span>Last 12 months</span></div><div style="overflow-x:auto"><table class="grid"><thead><tr><th>Date</th><th>Type</th><th>Department</th><th>Provider</th><th>Description</th></tr></thead><tbody>${C.encounters.map((r,ri)=>`<tr>${r.map((c,ci)=>`<td${ci===4?` data-hlk="enc${ri}"`:""}>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div></div>`;
   } else if(view==="info"){
     const val = (v)=> Array.isArray(v) ? v.map(esc).join("<br>") : esc(v);
-    body = `<div class="panel"><div class="ph">Patient Information Sheet <span>${C.tab}</span></div><table class="grid"><tbody>${C.info.map(r=>`<tr><td class="lbl">${esc(r[0])}</td><td>${val(r[1])}</td></tr>`).join("")}</tbody></table></div>`;
+    body = `<div class="panel"><div class="ph">Patient Information Sheet <span>${C.tab}</span></div><table class="grid"><tbody>${C.info.map((r,ri)=>`<tr><td class="lbl">${esc(r[0])}</td><td data-hlk="info${ri}">${val(r[1])}</td></tr>`).join("")}</tbody></table></div>`;
   } else if(view==="meds"){
-    body = `<div class="panel"><div class="ph">Medications <span>Drug history</span></div><table class="grid"><thead><tr><th>Medication</th><th>Directions</th><th>Indication</th></tr></thead><tbody>${C.meds.map(r=>`<tr>${r.map(c=>`<td>${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    body = `<div class="panel"><div class="ph">Medications <span>Drug history</span></div><table class="grid"><thead><tr><th>Medication</th><th>Directions</th><th>Indication</th></tr></thead><tbody>${C.meds.map((r,ri)=>`<tr>${r.map((c,ci)=>`<td data-hlk="med${ri}-${ci}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
   } else if(view==="tobacco"){
-    body = `<div class="panel"><div class="ph">Tobacco Use <span>Flowsheet</span></div><table class="grid"><thead><tr><th>Measure</th><th>Value</th><th>Reference values</th></tr></thead><tbody>${C.flow.map(r=>`<tr><td>${esc(r[0])}</td><td>${r[1]}</td><td class="ref">${r[2]}</td></tr>`).join("")}</tbody></table>
+    body = `<div class="panel"><div class="ph">Tobacco Use <span>Flowsheet</span></div><table class="grid"><thead><tr><th>Measure</th><th>Value</th><th>Reference values</th></tr></thead><tbody>${C.flow.map((r,ri)=>`<tr><td>${esc(r[0])}</td><td data-hlk="tob${ri}">${r[1]}</td><td class="ref">${r[2]}</td></tr>`).join("")}</tbody></table>
       <div class="foot">${FOOTNOTES}</div></div>`;
   } else if(view==="resources"){
-    body = RESOURCES_HTML + `<div class="panel"><div class="ph">Your IPE questions <span>${C.tab}</span></div><div class="pb"><ol class="qlist">${C.qs.map((Q,i)=>{
-      const state = !s.started ? "Not started" : (s.closed[i]||i<s.q) ? "Done" : i===s.q && !s.ended ? "In progress" : "Coming up";
-      return `<li><b>${STEPS[i].label}.</b> ${esc(Q.text)}<br><span>${state}</span></li>`; }).join("")}</ol></div></div>`;
+    body = qGuideHtml(C, s) + RESOURCES_HTML;
   } else if(view==="feedback"){
     body = `<div class="panel"><div class="ph">Feedback <span>${C.tab} · ${C.tag}</span></div><div class="pb"><p class="fbtext">${esc(feedbackText(cur))}</p></div></div>
       <div class="panel"><div class="ph">Rubric results</div><div style="overflow-x:auto">${rubricTable(cur)}</div></div>
       <div class="panel"><div class="ph">Copy your chat for the assignment <button class="btn pri" type="button" data-copy>Copy chat and feedback</button></div><div class="pb">
-        <p style="color:var(--e-sub)">Includes the full chat, your rubric results, the feedback and the reflection questions. If the button doesn't copy, click in the box, press Ctrl+A then Ctrl+C.</p>
-        <textarea class="transcript" id="transcript" readonly aria-label="Chat transcript">${esc(transcript(cur))}</textarea>
-        <b>Reflection questions</b><ol class="refl">${REFLECT(C.tab).map(q=>`<li>${esc(q)}</li>`).join("")}</ol></div></div>`;
+        <p style="color:var(--e-sub)">Includes the full chat, your rubric results, your feedback and the problems you highlighted. If the button doesn't copy, click in the box, press Ctrl+A then Ctrl+C.</p>
+        <textarea class="transcript" id="transcript" readonly aria-label="Chat transcript">${esc(transcript(cur))}</textarea></div></div>`;
   }
-  $("work").innerHTML = bannerHtml() + body;
+  $("work").innerHTML = bannerHtml() + (chartViews.includes(view) ? highlightBar() : "") + body;
+  applyHighlights($("work"));
   syncCompose();
 }
 
 function renderSteps(){
-  const C=CASES[cur], s=st(cur);
-  $("steps").innerHTML = STEPS.map((p,i)=>{
-    let cls="";
-    if(i<C.qs.length){ if(s.started && (i<s.q || s.closed[i] && i!==s.q)) cls="done"; else if(s.started && !s.ended && i===s.q) cls="now"; else if(s.ended && i<=s.q && s.closed[i]) cls="done"; }
-    else { if(s.ended) cls="done"; else if(s.started && s.q>=C.qs.length) cls="now"; }
-    const mark = cls==="done" ? "✓" : (i<4 ? i+1 : "★");
-    return `<button type="button" class="step ${cls}" data-step="${i}" ${cls==="done"?"":"tabindex='-1'"} title="${cls==="done"?"Jump to this part of the chat":""}"><span class="d">${mark}</span><b>${p.k}</b><span>${p.label}</span></button>`;
+  const C=CASES[cur], s=st(cur), curQ = s.q<C.qs.length ? C.qs[s.q] : null;
+  $("steps").innerHTML = STEPS.map((p,k)=>{
+    let cls="", extra="";
+    if(k<4){
+      const idx = C.qs.map((Q,i)=>Q.step===k?i:-1).filter(i=>i>=0);
+      const allDone = idx.every(i=>s.closed[i] || i<s.q);
+      if(s.started && allDone && !(curQ && curQ.step===k && !s.ended)) cls="done";
+      else if(s.started && !s.ended && curQ && curQ.step===k) cls="now";
+      if(cls==="now" && curQ.part) extra = `<span class="part">Part ${curQ.part} of ${idx.length}</span>`;
+    } else { if(s.ended) cls="done"; else if(s.started && s.q>=C.qs.length) cls="now"; }
+    const mark = cls==="done" ? "✓" : (k<4 ? k+1 : "★");
+    return `<button type="button" class="step ${cls}" data-step="${k}" ${cls==="done"?"":"tabindex='-1'"} title="${cls==="done"?"Jump to this part of the chat":""}"><span class="d">${mark}</span><b>${p.k}</b><span>${p.label}</span>${extra}</button>`;
   }).join("");
 }
 
@@ -1081,7 +1401,7 @@ function syncCompose(){
   const s=st(cur), C=CASES[cur];
   const box=$("input");
   box.disabled = s.ended;
-  box.placeholder = !s.started ? "Click Start Simulation to begin" : s.ended ? "Simulation ended" : s.awaiting ? "Pick a sample answer above" : "Type your reply to Maya…";
+  box.placeholder = !s.started ? "Click Start Simulation to begin" : s.ended ? "Simulation ended" : s.awaiting ? "Pick an example answer above" : "Type your reply to Maya… (Enter sends · Shift + Enter for a new line)";
   $("btn-send").disabled = busy || s.ended;
   const left = Math.max(0, CONFIG.maxHints - s.hintsUsed);
   const hintOff = busy || !s.started || s.ended || s.awaiting || s.q>=C.qs.length || left===0;
@@ -1126,12 +1446,37 @@ document.addEventListener("click", e=>{
   if(t.dataset.skip!==undefined){ skipOptions(cur, +t.dataset.skip); return; }
   if(t.dataset.step!==undefined && t.classList.contains("step") && t.classList.contains("done")){
     const i=+t.dataset.step;
-    const el = i<4 ? document.getElementById(`${cur}-div-${i}`) : st(cur).el.lastElementChild;
+    const el = i<4 ? document.getElementById(`${cur}-div-${firstOfStep(CASES[cur], i)}`) : st(cur).el.lastElementChild;
     if(el) el.scrollIntoView({behavior:"smooth",block:"start"});
     return;
   }
 });
 $("btn-send").addEventListener("click", send);
+// Highlighter events
+const hlBtn = $("hl-btn");
+document.addEventListener("mouseup", e=>{
+  if(e.target.closest("#hl-btn")) return;
+  setTimeout(()=>{
+    if(selectionInChart()){
+      hlBtn.style.left = Math.min(e.clientX+8, window.innerWidth-110)+"px";
+      hlBtn.style.top = Math.max(e.clientY-38, 8)+"px";
+      hlBtn.hidden = false;
+    } else hlBtn.hidden = true;
+  }, 0);
+});
+hlBtn.addEventListener("mousedown", e=>e.preventDefault());
+hlBtn.addEventListener("click", ()=>{ addHighlightFromSelection(); hlBtn.hidden=true; });
+document.addEventListener("click", e=>{
+  const m=e.target.closest("mark.hl");
+  if(m && !window.getSelection().toString()){ removeHighlight(m.dataset.hid); return; }
+  if(e.target.closest("[data-hl-clear]")){ st(cur).hl=[]; renderStory(); renderWork(); }
+});
+$("work").addEventListener("scroll", ()=>{ hlBtn.hidden=true; });
+// Warn before a refresh or close wipes the chat.
+window.addEventListener("beforeunload", e=>{
+  const unsaved = Object.values(S).some(x=>x.log.some(m=>m.type==="me") || x.hl.length);
+  if(unsaved){ e.preventDefault(); e.returnValue=""; }
+});
 $("input").addEventListener("keydown", e=>{ if(e.key==="Enter" && !e.shiftKey){ e.preventDefault(); send(); } });
 $("btn-hint").addEventListener("click", giveHint);
 $("btn-end").addEventListener("click", ()=>{ $("confirm-end").hidden=false; });
@@ -1149,3 +1494,5 @@ document.addEventListener("keydown", e=>{ if(e.key==="Escape") $("modal").hidden
 $("engine-badge").textContent = CONFIG.engine==="claude" ? "Live: Claude" : "Practice engine · no AI";
 renderAll();
 </script>
+
+</body></html>
