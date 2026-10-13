@@ -1,0 +1,899 @@
+<!doctype html>
+<!-- IPE Dental Collaborator · version 7.0
+     v5.0 EHR template + Taylor Watterson's guided flow (group chat, 4 steps, one A at a time, debrief, signed final report).
+     Talks to Claude through the Netlify function /api/maya. Maya's dental notes and the faculty keys stay on the server. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IPE Dental Collaborator</title>
+<style>
+/* Layout: desktop EHR workstation (laptop-first). Storyboard | chart area | Secure Chat with step timeline.
+   Deliberately a single light theme, like a real clinical system; every colour is set explicitly. */
+:root{
+  --e-chrome:#24405f; --e-chrome-2:#2f5479; --e-chrome-fg:#f2f6fa;
+  --e-pane:#f4f6f8; --e-white:#ffffff; --e-line:#c6cfd9; --e-line-2:#dfe5eb;
+  --e-head:#e7edf3; --e-tab:#d8e2ec; --e-sel:#cfe3f6; --e-hover:#eaf2fa;
+  --e-text:#1b2631; --e-sub:#56636f; --e-link:#0a5fa3;
+  --e-story:#e6edf4; --e-story-line:#c9d6e3;
+  --e-alert:#b3261e; --e-alert-bg:#fdecea;
+  --e-bpa:#fff4cc; --e-bpa-line:#e2c35a;
+  --e-ok:#2e7d32; --e-ok-bg:#e5f3e6; --e-warn:#8a5a00; --e-warn-bg:#fff1d6;
+  --e-train:#f7d046; --e-me:#dbeafa; --e-them:#ffffff; --e-hint:#f3ecff; --e-hint-line:#cdbbf0; --e-hint-fg:#4b2f86;
+  --e-desk:#d9e0e7;
+  --font:"Segoe UI",Tahoma,Arial,sans-serif;
+  color-scheme:light;
+}
+html,body{height:100%;margin:0}
+body{background:var(--e-desk);color:var(--e-text);font-family:var(--font);font-size:13px;line-height:1.45;padding-inline:16px;padding-block:12px;box-sizing:border-box}
+*{box-sizing:border-box}
+button{font:inherit;cursor:pointer}
+button:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:2px solid var(--e-link);outline-offset:1px}
+.scroller{height:100%;overflow:auto;border-radius:6px;box-shadow:0 2px 10px rgba(20,40,60,.18)}
+.app{min-width:1280px;height:100%;min-height:660px;display:grid;grid-template-rows:auto auto auto 1fr;background:var(--e-pane);border:1px solid var(--e-line)}
+
+/* Top chrome */
+.train{background:var(--e-train);color:#3b2f00;font-weight:700;font-size:11px;letter-spacing:.06em;text-align:center;padding:3px 8px;text-transform:uppercase}
+.top{display:flex;align-items:center;gap:2px;background:var(--e-chrome);color:var(--e-chrome-fg);padding:0 8px;height:36px}
+.logo{font-weight:700;padding:0 12px 0 4px;border-right:1px solid rgba(255,255,255,.2);margin-right:6px;display:flex;align-items:center;gap:7px}
+.logo i{width:14px;height:14px;border-radius:3px;background:#7fb4e6;display:inline-block}
+.top .act{background:none;border:0;color:inherit;padding:6px 10px;border-radius:3px}
+.top .act:hover{background:var(--e-chrome-2)}
+.top .sp{flex:1}
+.engine{font-size:11px;background:#f7d046;color:#3b2f00;font-weight:700;border-radius:10px;padding:2px 9px;margin-right:8px}
+.top .user{font-size:11.5px;opacity:.85}
+.ptabs{display:flex;gap:2px;background:var(--e-chrome-2);padding:4px 8px 0}
+.ptab{background:var(--e-tab);color:var(--e-text);padding:5px 14px;border:0;border-radius:4px 4px 0 0;font-size:12.5px;display:flex;gap:8px;align-items:center}
+.ptab:hover{background:#e6edf4}
+.ptab.on{background:var(--e-pane);font-weight:600}
+.ptab small{font-weight:400;color:var(--e-sub)}
+.ptab .tick{color:var(--e-ok);font-weight:700}
+.ptab.util{background:#bfcfdf}
+.ptab.util.on{background:var(--e-pane)}
+.ptabs .gap{flex:1}
+
+/* Body grid */
+.body{display:grid;grid-template-columns:210px minmax(0,1fr) minmax(560px,40%);min-height:0}
+.story{background:var(--e-story);border-right:1px solid var(--e-story-line);padding:12px;display:flex;flex-direction:column;gap:9px;overflow:auto}
+.photo{width:54px;height:54px;border-radius:50%;background:#b9c9da;display:grid;place-items:center;font-weight:700;color:#3b5671;font-size:17px}
+.pname{font-size:16px;font-weight:700}
+.pmeta{color:var(--e-sub);font-size:11.5px}
+.sb{border-top:1px solid var(--e-story-line);padding-top:7px;display:grid;gap:3px}
+.sbl{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--e-sub);font-weight:600}
+.allergy{background:var(--e-white);color:var(--e-sub);padding:3px 6px;border-radius:3px;border-left:3px solid var(--e-line)}
+.flag{display:inline-block;background:#fff1e0;border:1px solid #e7a54a;color:#7a4500;border-radius:3px;padding:1px 6px;font-size:11px;margin:1px 2px 1px 0}
+
+.main{display:grid;grid-template-columns:132px minmax(0,1fr);min-height:0}
+.main.solo{grid-template-columns:minmax(0,1fr)}
+.main.solo .acts{display:none}
+.acts{background:var(--e-white);border-right:1px solid var(--e-line);padding:6px 0;display:flex;flex-direction:column}
+.acts button{background:none;border:0;text-align:left;padding:8px 12px;color:var(--e-text);border-left:3px solid transparent}
+.acts button:hover{background:var(--e-hover)}
+.acts button.on{background:var(--e-sel);border-left-color:var(--e-link);font-weight:600}
+.work{padding:10px;display:flex;flex-direction:column;gap:10px;overflow:auto;min-width:0}
+
+.bpa{background:var(--e-bpa);border:1px solid var(--e-bpa-line);border-radius:3px;padding:9px 11px;display:grid;gap:6px}
+.bpa .t{font-weight:700;font-size:12px}
+.bpa .q{font-size:13.5px}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.btn{background:var(--e-white);border:1px solid var(--e-line);border-radius:3px;padding:4px 11px;color:var(--e-text)}
+.btn:hover:not(:disabled){background:var(--e-hover)}
+.btn.pri{background:var(--e-link);border-color:var(--e-link);color:#fff}
+.btn.pri:hover:not(:disabled){background:#084f88}
+.btn.hint{background:var(--e-hint);border-color:var(--e-hint-line);color:var(--e-hint-fg)}
+.btn.danger{color:var(--e-alert);border-color:#e3aaa6}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.panel{background:var(--e-white);border:1px solid var(--e-line);border-radius:3px;min-width:0}
+.ph{background:var(--e-head);border-bottom:1px solid var(--e-line);padding:6px 10px;font-weight:600;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ph span{font-weight:400;color:var(--e-sub);font-size:11.5px}
+.pb{padding:10px 12px;display:grid;gap:8px}
+.pb p{margin:0;max-width:85ch}
+table.grid{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+.grid th{background:var(--e-head);text-align:left;font-weight:600;padding:5px 9px;border-bottom:1px solid var(--e-line);white-space:nowrap}
+.grid td{padding:5px 9px;border-bottom:1px solid var(--e-line-2);vertical-align:top}
+.grid tr:last-child td{border-bottom:0}
+.grid td.lbl{color:var(--e-sub);width:150px}
+.grid td.ref{color:var(--e-sub);font-size:12px}
+.callout{background:#fffbe0;border:1px solid #efe08a;border-radius:3px;padding:8px 10px}
+.callout b{display:block;margin-bottom:2px}
+.dentalnote{background:#fffbe0;border-left:3px solid #e2c35a;padding:2px 6px;display:inline-block}
+.foot{border-top:1px solid var(--e-line-2);padding:7px 10px;font-size:11.5px;color:var(--e-sub);line-height:1.5}
+.foot a,.links a{color:var(--e-link)}
+.links{margin:0;padding:0;list-style:none}
+.links li{padding:6px 10px;border-bottom:1px solid var(--e-line-2)}
+.links li:last-child{border-bottom:0}
+.links a{font-weight:600}
+.links span{display:block;font-size:11.5px;color:var(--e-sub)}
+.sub{font-size:11px;color:var(--e-sub)}
+ul.tight{margin:0;padding-left:18px;display:grid;gap:3px}
+.field{display:grid;gap:5px}
+.field label{color:var(--e-sub)}
+.field input{max-width:340px;border:1px solid var(--e-line);border-radius:3px;padding:5px 7px;font:inherit;color:var(--e-text);background:var(--e-white)}
+
+/* Final report */
+.rep{display:grid;gap:12px;max-width:90ch}
+.rep h2{margin:0;font-size:18px}
+.rep .meta{color:var(--e-sub);font-size:12px}
+.rep section{display:grid;gap:7px;border-top:1px solid var(--e-line-2);padding-top:10px}
+.rep h3{margin:0;font-size:13.5px;color:var(--e-link)}
+.rep .case{display:grid;grid-template-columns:110px minmax(0,1fr);gap:10px}
+.rep .case > b{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--e-sub);padding-top:2px}
+.rep .case p{margin:0 0 3px}
+.rep .nd{color:var(--e-sub);font-style:italic}
+.report-text{width:100%;min-height:420px;resize:vertical;font:13px/1.5 var(--font);border:1px solid var(--e-line);border-radius:3px;padding:8px;color:var(--e-text);background:var(--e-white)}
+.signoff{display:grid;gap:8px;border-top:1px solid var(--e-line-2);padding-top:10px}
+.signoff label.chk{display:flex;gap:8px;align-items:flex-start}
+.note-back{background:var(--e-warn-bg);border:1px solid #e9c98a;color:var(--e-warn);border-radius:3px;padding:6px 9px}
+
+/* Chat */
+.chat{background:var(--e-white);border-left:1px solid var(--e-line);display:grid;grid-template-rows:auto auto 1fr auto;min-height:0}
+.ch{background:var(--e-chrome);color:var(--e-chrome-fg);padding:8px 12px;display:flex;justify-content:space-between;align-items:center}
+.ch small{display:block;opacity:.8;font-size:11px}
+.dot{width:8px;height:8px;border-radius:50%;background:#5bd37a;display:inline-block;margin-right:6px}
+.ch .btn{background:transparent;color:var(--e-chrome-fg);border-color:rgba(255,255,255,.35);font-size:11.5px;padding:3px 9px}
+.steps{display:grid;grid-template-columns:repeat(5,1fr);padding:10px 8px 8px;background:var(--e-head);border-bottom:1px solid var(--e-line);min-height:62px}
+.steps.intro{display:flex;align-items:center;justify-content:center;font-weight:600;color:var(--e-link)}
+.step{display:grid;justify-items:center;gap:2px;position:relative;color:var(--e-sub)}
+.step::before{content:"";position:absolute;top:11px;left:-50%;width:100%;height:3px;background:var(--e-line);z-index:0}
+.step:first-child::before{display:none}
+.step.done::before,.step.now::before{background:var(--e-link)}
+.step .d{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;background:var(--e-white);border:2px solid var(--e-line);position:relative;z-index:1}
+.step.done{color:var(--e-text)}
+.step.done .d{background:var(--e-link);border-color:var(--e-link);color:#fff}
+.step.now{color:var(--e-text)}
+.step.now .d{border-color:var(--e-link);color:var(--e-link);box-shadow:0 0 0 3px #cfe3f6}
+.step b{font-size:11px}
+.step span{font-size:10.5px;line-height:1.2;text-align:center}
+.part{font-size:10.5px;color:var(--e-link);font-weight:700}
+.msgs{overflow:auto;background:#f7f9fb;min-height:0}
+.thread{padding:12px;display:flex;flex-direction:column;gap:9px}
+.m{max-width:88%;padding:7px 10px;border-radius:7px;border:1px solid var(--e-line-2);background:var(--e-them);white-space:pre-wrap;word-wrap:break-word}
+.m .who{font-size:10.5px;color:var(--e-sub);margin-bottom:2px;white-space:normal}
+.m.me{align-self:flex-end;background:var(--e-me);border-color:#bcd6f0}
+.m.hint{background:var(--e-hint);border-color:var(--e-hint-line)}
+.m.hint .who{color:var(--e-hint-fg);font-weight:600}
+.sys{align-self:center;font-size:10.5px;color:var(--e-sub);background:var(--e-head);padding:2px 10px;border-radius:10px;text-align:center;max-width:92%}
+.div{align-self:stretch;display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:var(--e-link);margin-top:4px;text-transform:uppercase;letter-spacing:.05em}
+.div::before,.div::after{content:"";flex:1;height:1px;background:var(--e-line)}
+.card{align-self:stretch;border:1px solid var(--e-line);border-radius:6px;background:var(--e-white);padding:10px 11px;display:grid;gap:6px}
+.card h4{margin:0;font-size:12.5px}
+.card p{margin:0}
+.card.debrief{border-color:#b9d3ec;background:#f5f9fd}
+.card ol{margin:0;padding-left:18px;display:grid;gap:3px}
+.typing{align-self:flex-start;font-size:11px;color:var(--e-sub);font-style:italic}
+.guide{display:grid;gap:7px;margin:0;padding:0;list-style:none;counter-reset:g}
+.guide li{display:grid;grid-template-columns:22px 1fr;gap:8px;align-items:start}
+.guide li::before{counter-increment:g;content:counter(g);width:20px;height:20px;border-radius:50%;background:var(--e-sel);color:var(--e-link);font-weight:700;font-size:11px;display:grid;place-items:center}
+.rules{background:#fffbe0;border:1px solid #efe08a;border-radius:5px;padding:8px 10px;display:grid;gap:4px}
+.rules ul{margin:0;padding-left:18px;display:grid;gap:3px}
+.compose{border-top:1px solid var(--e-line);padding:8px;display:grid;gap:6px;background:var(--e-white)}
+.compose textarea{width:100%;resize:vertical;min-height:84px;height:84px;max-height:240px;border:1px solid var(--e-line);border-radius:3px;padding:6px 7px;font:inherit;color:var(--e-text);background:var(--e-white)}
+.compose .row{justify-content:space-between}
+.tries{font-size:11px;color:var(--e-sub)}
+.confirm{background:var(--e-alert-bg);border:1px solid #e3aaa6;border-radius:4px;padding:6px 8px;display:flex;gap:6px;align-items:center;justify-content:space-between;font-size:12px}
+
+/* Modal, toast, setup note */
+.modal{position:fixed;inset:0;background:rgba(20,32,45,.45);display:grid;place-items:center;z-index:20;padding:16px}
+.modal .box{background:var(--e-white);border-radius:6px;max-width:620px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);overflow:hidden}
+.modal .ph{font-size:14px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--e-text);color:#fff;padding:7px 14px;border-radius:5px;font-size:12.5px;z-index:30}
+.setup{position:fixed;top:0;left:0;right:0;z-index:40;background:var(--e-alert-bg);color:#7a2416;border-bottom:1px solid #e3aaa6;padding:7px 14px;display:flex;gap:10px;align-items:center;justify-content:space-between}
+
+/* Highlighter */
+mark.hl{background:#fff176;color:inherit;border-radius:2px;padding:0 1px;cursor:pointer;box-shadow:0 0 0 1px #f2d63c}
+mark.hl:hover{background:#ffe94d;text-decoration:line-through;text-decoration-color:rgba(0,0,0,.35)}
+.hl-float{position:fixed;z-index:40;background:#fff176;border:1px solid #d4b81f;color:#3b2f00;font-weight:700;border-radius:4px;padding:4px 10px;box-shadow:0 2px 8px rgba(0,0,0,.2);font-size:12px}
+.hl-float:hover{background:#ffe94d}
+.hlbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;background:#fffbe0;border:1px solid #efe08a;border-radius:3px;padding:6px 10px;font-size:12px;color:#5a4a00}
+.hlbar .sw{display:inline-block;width:12px;height:12px;background:#fff176;border:1px solid #d4b81f;border-radius:2px;vertical-align:-2px;margin-right:4px}
+.hlbar .sp{flex:1}
+.hlchips{display:flex;flex-wrap:wrap;gap:5px}
+.hlchip{background:#fff176;border:1px solid #e6cf3a;border-radius:3px;padding:1px 7px;font-size:12px}
+[data-hlk]{cursor:text}
+[hidden]{display:none!important}
+.noscript{max-width:640px;margin:40px auto;background:#fff;border:1px solid var(--e-line);border-radius:6px;padding:16px 18px}
+@media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<div class="scroller">
+<div class="app" id="app">
+  <div class="train">Training environment · simulated patients and collaborator · not for clinical use</div>
+  <div class="top">
+    <span class="logo"><i></i>IPE Sim EHR</span>
+    <button class="act" type="button" id="btn-guide">How it works</button>
+    <button class="act" type="button" data-goto="chart">Chart</button>
+    <button class="act" type="button" data-goto="info">Patient Info</button>
+    <span class="sp"></span>
+    <span class="engine" id="engine-badge" hidden>Backup Maya · no AI</span>
+    <span class="user">PharmD student group · PHAR 462</span>
+  </div>
+  <div class="ptabs" id="ptabs" role="tablist" aria-label="Sections"></div>
+  <div class="body">
+    <aside class="story" id="story" aria-label="Patient storyboard"></aside>
+    <div class="main" id="main">
+      <nav class="acts" id="acts" aria-label="Chart activities">
+        <button type="button" data-sub="chart">Chart Review</button>
+        <button type="button" data-sub="info">Patient Info</button>
+        <button type="button" data-sub="meds">Medications</button>
+        <button type="button" data-sub="tobacco">Tobacco</button>
+      </nav>
+      <div class="work" id="work"></div>
+    </div>
+    <aside class="chat" aria-label="Secure Chat">
+      <div class="ch">
+        <div><span class="dot"></span><b>Maya Chen</b><small id="chat-sub">Dental Student (D2)</small></div>
+        <button class="btn" type="button" id="btn-copy-top">Copy for Canvas</button>
+      </div>
+      <div class="steps" id="steps" aria-label="Case steps"></div>
+      <div class="msgs" id="msgs" aria-live="polite"><div class="thread" id="thread"></div></div>
+      <div class="compose">
+        <div class="confirm" id="confirm" hidden><span id="confirm-text"></span><span class="row"><button class="btn danger" type="button" id="yes">Finish and debrief</button><button class="btn" type="button" id="no">Keep chatting</button></span></div>
+        <textarea id="input" aria-label="Message Maya"></textarea>
+        <button class="hl-float" type="button" id="hl-btn" hidden>Highlight</button>
+        <div class="row">
+          <span class="row"><button class="btn hint" type="button" id="btn-hint" data-hint>Ask Maya for a hint</button><span class="tries" id="tries"></span></span>
+          <span class="row"><button class="btn" type="button" id="next" data-next></button><button class="btn pri" type="button" id="send">Send</button></span>
+        </div>
+      </div>
+    </aside>
+  </div>
+</div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="box" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="ph"><b id="modal-title">How the simulation works</b><button class="btn" type="button" id="modal-close">Close</button></div>
+    <div class="pb" id="modal-body"></div>
+  </div>
+</div>
+
+<script src="./cases.js"></script>
+<script type="module">
+if (!window.IPE_DATA) {
+  document.getElementById("work").innerHTML = '<div class="bpa"><span class="t">Case file missing</span><span class="q">cases.js did not load. Upload the whole public folder (index.html and cases.js together), then reload.</span></div>';
+  throw new Error("cases.js missing");
+}
+const { CASES, ORDER, STAGES, FIVE_A, TEAM_INTRO, TEAM_BACKUP, stepText } = window.IPE_DATA;
+
+/* =====================================================================
+   FACULTY SETTINGS: change these without touching the rest of the file
+   ===================================================================== */
+const CONFIG = {
+  engine: "claude",       // "claude" = live Maya through the Netlify function. "practice" = backup Maya only (no AI, no cost)
+  apiUrl: "/api/maya",
+  maxHints: 3,            // "Ask Maya for a hint" presses per case
+  minMsgsPerCase: 4,      // group messages needed in a case before "Finish and debrief" unlocks
+  timeoutMs: 40000        // how long to wait for Maya before backup Maya answers
+};
+// Add ?practice to the link (e.g. yoursite.netlify.app/?practice) to run backup Maya only.
+if (new URLSearchParams(location.search).has("practice") || location.protocol === "file:") CONFIG.engine = "practice";
+
+/* =====================================================================
+   STATE: one continuous conversation, saved in this browser
+   ===================================================================== */
+const SAVE_KEY = "ipe-maya-v7", CODE_KEY = "ipe-class-code";
+const fresh = () => ({ phase: "team", log: [], turns: { team: [] }, step: {}, fiveA: {}, debriefed: {}, hintsUsed: {}, hintSeen: {},
+  beat: {}, backupNoted: {}, hl: {}, group: "", report: "", reportNote: "", approved: false, signers: "", editing: false, copied: false,
+  started: new Date().toISOString() });
+let T = fresh();
+let view = "team", sub = "chart", busy = false, backupNow = false, classCode = "", hlSeq = 0;
+try { classCode = sessionStorage.getItem(CODE_KEY) || ""; } catch (e) {}
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const now = () => new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+const isCase = (id) => ORDER.includes(id);
+const nameOf = (id) => id === "team" ? "Introductions" : CASES[id].name;
+const groupMsgs = (sec) => T.log.filter(m => m.who === "me" && m.sec === sec).length;
+const curStep = () => T.phase === "team" ? 0 : (T.step[T.phase] || 1);
+const allDone = () => ORDER.every(id => T.debriefed[id]);
+const awaitingDebrief = () => isCase(T.phase) && curStep() >= 5 && !T.debriefed[T.phase];
+function toast(t) { const d = document.createElement("div"); d.className = "toast"; d.textContent = t; document.body.appendChild(d); setTimeout(() => d.remove(), 2200); }
+function addLog(m) { m.t = m.t || now(); if (!m.sec) m.sec = T.phase; T.log.push(m); }
+function say(text, phase) { addLog({ who: "maya", text, sec: phase, step: phase === "team" ? 0 : (T.step[phase] || 1) }); (T.turns[phase] ||= []).push({ role: "assistant", content: text }); }
+
+function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ T, view, sub })); } catch (e) {} }
+function restore() {
+  try {
+    const s = JSON.parse(localStorage.getItem(SAVE_KEY) || "null");
+    if (!s || !s.T || !Array.isArray(s.T.log) || !s.T.log.some(m => m.who === "me")) return false;
+    T = Object.assign(fresh(), s.T);
+    T.log = T.log.filter(m => !m.temp);
+    T.editing = false;
+    view = s.view || T.phase; sub = s.sub || "chart";
+    Object.values(T.hl).forEach(list => list.forEach(h => { hlSeq = Math.max(hlSeq, h.id); }));
+    addLog({ who: "sys", text: "Your conversation was restored after the page reloaded." });
+    return true;
+  } catch (e) { return false; }
+}
+if (!restore()) say(TEAM_INTRO, "team");
+
+/* =====================================================================
+   SERVER: live Maya, debrief and report through /api/maya
+   ===================================================================== */
+let codePrompt = null;
+function askCode(note) {
+  if (codePrompt) return codePrompt;
+  codePrompt = new Promise(resolve => {
+    const wrap = document.createElement("div");
+    wrap.className = "modal";
+    wrap.innerHTML = `<form class="box" style="max-width:380px"><div class="ph"><b>Enter your class code</b></div><div class="pb">
+      <p class="sub" style="font-size:12.5px">Your instructor will give you this code in class.</p>
+      ${note ? `<p style="color:var(--e-alert)">${esc(note)}</p>` : ""}
+      <div class="field"><input id="code-in" type="text" autocomplete="off" aria-label="Class code"></div>
+      <div class="row"><button class="btn pri" type="submit">Continue</button></div></div></form>`;
+    document.body.appendChild(wrap);
+    const input = wrap.querySelector("input"); input.focus();
+    wrap.querySelector("form").addEventListener("submit", e => {
+      e.preventDefault(); const v = input.value.trim(); if (!v) return;
+      wrap.remove(); codePrompt = null; resolve(v);
+    });
+  });
+  return codePrompt;
+}
+function setupNote(text) {
+  let el = $("setup-note");
+  if (!el) { el = document.createElement("div"); el.id = "setup-note"; el.className = "setup"; document.body.appendChild(el); }
+  el.innerHTML = `<span>Setup note for your instructor: ${esc(text)}</span><button class="btn" type="button" id="setup-x">Dismiss</button>`;
+  $("setup-x").onclick = () => el.remove();
+}
+const SETUP_ERRORS = ["No API key", "No credit", "Bad API key", "Model not found"];
+async function api(body) {
+  let note = "";
+  for (let attempt = 0; attempt < 4; attempt++) {
+    const ctrl = new AbortController(), timer = setTimeout(() => ctrl.abort(), CONFIG.timeoutMs);
+    let r;
+    try {
+      r = await fetch(CONFIG.apiUrl, { method: "POST", headers: { "Content-Type": "application/json", "X-Class-Code": classCode }, body: JSON.stringify(body), signal: ctrl.signal });
+    } catch (e) { throw { code: "network", message: String(e) }; }
+    finally { clearTimeout(timer); }
+    if (r.status === 401) {
+      classCode = ""; try { sessionStorage.removeItem(CODE_KEY); } catch (e) {}
+      classCode = await askCode(note); note = "That code didn't work. Check it and try again.";
+      try { sessionStorage.setItem(CODE_KEY, classCode); } catch (e) {}
+      continue;
+    }
+    let j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) {
+      if (j.detail) setupNote(j.detail);
+      if (SETUP_ERRORS.includes(j.error)) CONFIG.engine = "practice"; // stop calling a server that can't work today
+      throw { code: "upstream", status: r.status, error: j.error };
+    }
+    return j;
+  }
+  throw { code: "code" };
+}
+
+/* =====================================================================
+   BACKUP MAYA: scripted, no AI. Used with ?practice, or for one message when the live connection fails.
+   ===================================================================== */
+const A_ORDER = ["ask", "advise", "assess", "assist", "arrange"];
+function backupReply(p) {
+  if (p === "team") return { text: TEAM_BACKUP, step: 1, fiveA: "none" };
+  const C = CASES[p], B = (T.beat[p] ||= {});
+  for (let s = Math.min(4, curStep()); s <= 4; s++) {
+    const beats = C.backup[s], i = B[s] || 0;
+    if (i < beats.length) {
+      B[s] = i + 1;
+      return { text: beats[i], step: (s === 4 && i === beats.length - 1) ? 5 : s, fiveA: s === 3 ? A_ORDER[i] : "none" };
+    }
+  }
+  return { text: `Please click "Finish ${C.name} and debrief" below.`, step: 5, fiveA: "none" };
+}
+
+/* =====================================================================
+   FLOW
+   ===================================================================== */
+function nextAction() {
+  const p = T.phase;
+  if (p === "team") return { label: "Begin Margaret's case", ok: groupMsgs("team") > 0, run: () => begin("margaret") };
+  const nx = ORDER[ORDER.indexOf(p) + 1];
+  if (!T.debriefed[p]) return { label: `Finish ${CASES[p].name} and debrief`, ok: groupMsgs(p) >= CONFIG.minMsgsPerCase, run: askFinish };
+  if (nx) return { label: `Begin ${CASES[nx].name}'s case`, ok: true, run: () => begin(nx) };
+  return { label: "Go to final report", ok: true, run: () => { view = "report"; renderAll(); } };
+}
+function begin(id) {
+  T.phase = id; T.step[id] = 1; T.turns[id] = [];
+  addLog({ who: "div", text: `${CASES[id].name} · ${CASES[id].tag}`, sec: id });
+  say(CASES[id].intro, id);
+  view = id; sub = "chart";
+  renderAll(); $("input").focus();
+}
+
+async function send() {
+  const box = $("input"), text = box.value.trim(), p = T.phase;
+  if (!text || busy || allDone() || awaitingDebrief()) return;
+  box.value = "";
+  addLog({ who: "me", text, sec: p, step: curStep() });
+  (T.turns[p] ||= []).push({ role: "user", content: text });
+  busy = true; renderAll();
+  let out = null;
+  if (CONFIG.engine === "claude") {
+    try {
+      const j = await api({ mode: "chat", phase: p, turns: T.turns[p] });
+      out = { text: j.maya_reply, step: j.step, fiveA: j.five_a };
+      if (j.usage) console.info("Maya usage", j.usage);
+      backupNow = false;
+    } catch (e) { console.warn("Live Maya failed:", e); }
+  }
+  if (!out) {
+    out = backupReply(p); backupNow = true;
+    if (CONFIG.engine === "claude" && !T.backupNoted[p]) {
+      T.backupNoted[p] = true;
+      addLog({ who: "sys", text: "Maya's live connection dropped, so backup Maya answered this message. Keep going; your next message tries the live connection again.", sec: p });
+    }
+  }
+  if (isCase(p)) {
+    T.step[p] = Math.max(T.step[p] || 1, Math.min(5, out.step || 1));
+    if (T.step[p] === 3 && out.fiveA && out.fiveA !== "none") T.fiveA[p] = out.fiveA;
+  }
+  say(out.text, p);
+  busy = false; renderAll();
+}
+
+function giveHint() {
+  const p = T.phase;
+  if (!isCase(p)) { toast("Hints start with Margaret's case."); return; }
+  if (busy || T.debriefed[p] || curStep() > 4) return;
+  const used = T.hintsUsed[p] || 0;
+  if (used >= CONFIG.maxHints) { toast(`You've used all ${CONFIG.maxHints} hints for this case.`); return; }
+  const s = curStep(), list = CASES[p].hints[s] || [], k = `${p}:${s}`, seen = T.hintSeen[k] || 0;
+  if (seen >= list.length) { toast("No more hints for this step. Ask Maya in the chat."); return; }
+  T.hintSeen[k] = seen + 1; T.hintsUsed[p] = used + 1;
+  addLog({ who: "hint", text: list[seen], sec: p, step: s });
+  T.turns[p].push({ role: "assistant", content: "(Hint shown to the group) " + list[seen] });
+  renderAll();
+}
+
+function askFinish() {
+  $("confirm-text").textContent = `Finish ${CASES[T.phase].name} and get your debrief? You can't add to this case afterwards.`;
+  $("confirm").hidden = false;
+}
+async function finish() {
+  const p = T.phase, C = CASES[p];
+  addLog({ who: "sys", text: `Writing your debrief for ${C.name}…`, sec: p, temp: true });
+  busy = true; renderAll();
+  let text = null;
+  if (CONFIG.engine === "claude") {
+    try { text = (await api({ mode: "debrief", phase: p, transcript: sectionText(p, false) })).text; } catch (e) { console.warn("Debrief failed:", e); }
+  }
+  T.log = T.log.filter(m => !m.temp);
+  addLog(text ? { who: "debrief", text, sec: p } : { who: "debrief", offline: true, text: C.selfCheck.join("\n"), sec: p });
+  T.debriefed[p] = true; T.step[p] = 5;
+  busy = false; renderAll();
+}
+
+/* Final report: one request per case, run at the same time. */
+const REPORT_QS = [
+  ["scope", "Scope of practice: What can pharmacy and dentistry each do to assess and address the patient's needs?"],
+  ["referrals", "Referrals: If you were the first health professional to see the patient, which referrals or consultations would you make? Top 2 and why."],
+  ["tobacco", "Tobacco treatment plan: Based on the patient's readiness to quit, what is your plan using the 5 As?"],
+  ["note", "Joint interprofessional note"]
+];
+const blankParts = (t) => Object.fromEntries(REPORT_QS.map(([k]) => [k, t]));
+function ownWords(id) {
+  const by = s => T.log.filter(m => m.who === "me" && m.sec === id && m.step === s).map(m => m.text.replace(/\s+/g, " ")).join(" ") || "Not discussed.";
+  return { scope: by(1), referrals: by(2), tobacco: by(3), note: by(4) };
+}
+async function makeReport() {
+  busy = true; T.report = ""; T.approved = false; T.editing = false; T.reportNote = "Writing your report… this takes about 20 seconds."; renderAll();
+  let fallback = 0;
+  const results = await Promise.all(ORDER.map(async id => {
+    const tr = sectionText(id, false);
+    if (!tr) return [id, blankParts("Not discussed.")];
+    if (CONFIG.engine === "claude") {
+      for (let a = 0; a < 2; a++) {
+        try { const j = await api({ mode: "report", phase: id, transcript: tr }); return [id, { scope: j.scope, referrals: j.referrals, tobacco: j.tobacco, note: j.note }]; }
+        catch (e) { console.warn("Report failed:", id, e); if (CONFIG.engine !== "claude") break; }
+      }
+    }
+    fallback++;
+    return [id, ownWords(id)];
+  }));
+  T.report = assembleReport(Object.fromEntries(results));
+  T.reportNote = fallback ? "Backup Maya filled part of this report with your group's own messages, step by step. Edit it into clear answers before you sign off." : "";
+  busy = false; renderAll();
+}
+function assembleReport(parts) {
+  const L = ["PHAR 462 IPE Activity: Final Report", `Group: ${T.group || "(not entered)"}`];
+  REPORT_QS.forEach(([k, q], i) => {
+    L.push("", `${i + 1}. ${q}`);
+    ORDER.forEach(id => L.push(`${CASES[id].name}${CASES[id].tag === "Practice" ? " (practice)" : ""}: ${parts[id][k]}`));
+  });
+  return L.join("\n");
+}
+
+/* =====================================================================
+   TRANSCRIPT + COPY
+   ===================================================================== */
+function sectionText(sec, withDebrief = true) {
+  const L = [];
+  T.log.filter(m => m.sec === sec).forEach(m => {
+    if (m.who === "me") L.push(`[${m.t}] Group: ${m.text}`);
+    else if (m.who === "maya") L.push(`[${m.t}] Maya: ${m.text}`);
+    else if (m.who === "hint") L.push(`[${m.t}] (Hint shown to the group) ${m.text}`);
+    else if (m.who === "debrief" && withDebrief) L.push("", m.offline ? "Self-check:" : "Debrief:", m.text);
+  });
+  return L.some(l => l.includes("] Group:")) ? L.join("\n") : "";
+}
+function highlightList(id) {
+  const seen = new Set(), out = [];
+  (T.hl[id] || []).forEach(h => { const t = h.text.replace(/\s+/g, " ").trim(); if (t && !seen.has(t.toLowerCase())) { seen.add(t.toLowerCase()); out.push(t); } });
+  return out;
+}
+function transcript() {
+  const L = ["CHAT TRANSCRIPT", `Group: ${T.group || "(not entered)"} · Collaborator: Maya Chen, D2 (simulated) · ${new Date(T.started).toLocaleDateString()}`];
+  ["team", ...ORDER].forEach(id => {
+    const b = sectionText(id); if (!b) return;
+    L.push("", `=== ${nameOf(id).toUpperCase()} ===`, b);
+    const hl = isCase(id) ? highlightList(id) : [];
+    if (hl.length) { L.push("", "Problems we highlighted in the chart:"); hl.forEach(t => L.push("- " + t)); }
+  });
+  return L.join("\n");
+}
+function copy() {
+  if (T.report && !(T.approved && T.signers)) { view = "report"; renderAll(); toast("Review and sign off on the final report first."); return; }
+  const date = new Date().toLocaleDateString();
+  const sign = T.report ? `Reviewed and signed off by: ${T.signers} (${date})` : "";
+  const tr = transcript();
+  const text = (T.report ? T.report.trim() + "\n\n" + sign + "\n\n\n" : "") + tr;
+  const html = (T.report ? reportHTML(T.report, true) + `<p><em>${esc(sign)}</em></p><hr>` : "") + `<h3>Chat transcript</h3><pre style="white-space:pre-wrap;font-family:inherit">${esc(tr)}</pre>`;
+  const done = () => { T.copied = true; save(); toast(T.report ? "Report and transcript copied. Paste into Canvas." : "Transcript copied. Create the final report to include it."); };
+  const legacy = () => { const ta = document.createElement("textarea"); ta.value = text; ta.style.position = "fixed"; ta.style.top = "-1000px"; document.body.appendChild(ta); ta.select(); try { document.execCommand("copy"); done(); } catch (e) { toast("Copy didn't work. Select the text and copy it."); } ta.remove(); };
+  const plain = () => { try { navigator.clipboard.writeText(text).then(done, legacy); } catch (e) { legacy(); } };
+  try {
+    if (window.ClipboardItem && navigator.clipboard && navigator.clipboard.write) {
+      navigator.clipboard.write([new ClipboardItem({ "text/html": new Blob([html], { type: "text/html" }), "text/plain": new Blob([text], { type: "text/plain" }) })]).then(done, plain);
+    } else plain();
+  } catch (e) { plain(); }
+}
+
+/* =====================================================================
+   RENDER: tabs, storyboard, question box, chart views
+   ===================================================================== */
+function renderTabs() {
+  const tabs = [["team", "Team introductions", "Start here"], ...ORDER.map(id => [id, CASES[id].name, CASES[id].tag])];
+  $("ptabs").innerHTML = tabs.map(([id, l, tag]) => `<button type="button" role="tab" class="ptab ${id === view ? "on" : ""}" aria-selected="${id === view}" data-tab="${id}">${l}${T.debriefed[id] ? ' <span class="tick">✓</span>' : ""} <small>${tag}</small></button>`).join("")
+    + `<span class="gap"></span>`
+    + [["resources", "Resources"], ["report", "Final report"]].map(([id, l]) => `<button type="button" role="tab" class="ptab util ${id === view ? "on" : ""}" aria-selected="${id === view}" data-tab="${id}">${l}</button>`).join("");
+}
+
+function renderStory() {
+  let h;
+  if (isCase(view)) {
+    const C = CASES[view];
+    h = `<div class="photo">${C.initials}</div>
+      <div><div class="pname">${C.name}</div><div class="pmeta">${C.age} · MRN ${C.mrn}</div></div>
+      <div class="sb"><span class="sbl">Allergies</span><span class="allergy">Not listed in case</span></div>
+      <div class="sb"><span class="sbl">Flags</span><div>${C.flags.map((f, i) => `<span class="flag" data-hlk="sb-f${i}">${esc(f)}</span>`).join("")}</div></div>
+      <div class="sb"><span class="sbl">Dental</span><span>Exam today with Maya Chen, D2. Ask her in Secure Chat.</span></div>
+      <div class="sb"><span class="sbl">Care team</span><span>Maya Chen, D2</span><span>Your PharmD group</span></div>`;
+  } else {
+    const b = { team: ["IPE", "Care team", "Secure Chat · PHAR 462"], resources: ["Rx", "Resources", "5 As · 5 Rs · 5 Ds · NRT"], report: ["IPE", "Final report", "All three cases, by question"] }[view];
+    h = `<div class="photo">${b[0]}</div><div><div class="pname">${b[1]}</div><div class="pmeta">${b[2]}</div></div>
+      <div class="sb"><span class="sbl">Group</span><span>${esc(T.group || "Not entered yet")}</span></div>
+      <div class="sb"><span class="sbl">Progress</span>${ORDER.map(id => `<span>${CASES[id].name}: ${T.debriefed[id] ? "debriefed ✓" : T.phase === id ? "in progress" : "not started"}</span>`).join("")}</div>
+      <div class="sb"><span class="sbl">Care team</span><span>Maya Chen, D2 (simulated)</span><span>Your PharmD group</span></div>`;
+  }
+  $("story").innerHTML = h;
+  if (isCase(view)) applyHighlights($("story"));
+}
+
+function bannerHtml() {
+  const p = T.phase, a = nextAction(), guideBtn = `<button class="btn" type="button" data-guide>How it works</button>`;
+  const nextBtn = `<button class="btn ${a.ok ? "pri" : ""}" type="button" data-next ${busy || !a.ok ? "disabled" : ""}>${esc(a.label)}</button>`;
+  let title, q, btns;
+  if (p === "team") {
+    title = "Team introductions";
+    q = "Enter your group name below, then each member introduces themselves to Maya in Secure Chat. When everyone has, click Begin Margaret's case.";
+    btns = nextBtn + guideBtn;
+  } else {
+    const C = CASES[p], s = curStep(), nx = ORDER[ORDER.indexOf(p) + 1];
+    if (T.debriefed[p]) {
+      title = `${C.name} complete`;
+      q = nx ? `Read your debrief in the chat, then begin ${CASES[nx].name}'s case.` : "All three cases are done. Open Final report to create, review and sign your report, then copy it for Canvas.";
+      btns = nextBtn;
+    } else if (s >= 5) {
+      title = `${C.name} · Joint note approved`;
+      q = `Click Finish ${C.name} and debrief to get your debrief.`;
+      btns = nextBtn;
+    } else {
+      const fa = s === 3 && T.fiveA[p] ? ` · Now: ${FIVE_A[T.fiveA[p]]}` : "";
+      title = `${C.name}${C.tag === "Practice" ? " (practice)" : ""} · Step ${s} of 4 · ${STAGES[s - 1].k}${fa}`;
+      q = stepText(C, s);
+      const left = Math.max(0, CONFIG.maxHints - (T.hintsUsed[p] || 0));
+      btns = `<button class="btn hint" type="button" data-hint ${busy || !left ? "disabled" : ""}>${left ? `Ask Maya for a hint (${left} left)` : "No hints left"}</button>
+        <span class="tries">${a.ok ? "" : `Finish unlocks after ${CONFIG.minMsgsPerCase} group messages (${groupMsgs(p)} so far)`}</span>`;
+    }
+  }
+  const viewing = isCase(view) && view !== p && p !== "team" ? `<span class="sub">You're viewing ${CASES[view].name}'s chart. The chat is on ${CASES[p].name}.</span>` : "";
+  return `<div class="bpa"><span class="t">${esc(title)}</span><span class="q">${esc(q)}</span>${viewing}<div class="row">${btns}</div></div>`;
+}
+
+const RESOURCES = `
+<div class="panel"><div class="ph">The 5 As <span>Every patient who uses tobacco</span></div><table class="grid"><tbody>
+<tr><td class="lbl"><b>Ask</b></td><td>About tobacco use</td></tr>
+<tr><td class="lbl"><b>Advise</b></td><td>Clear, personal advice to quit</td></tr>
+<tr><td class="lbl"><b>Assess</b></td><td>Readiness to quit in the next 30 days</td></tr>
+<tr><td class="lbl"><b>Assist</b></td><td>Ready: quit date within 2 weeks, medicines, coping plan. Not ready: the 5 Rs. Recently quit: relapse prevention.</td></tr>
+<tr><td class="lbl"><b>Arrange</b></td><td>Follow-up in the first week after the quit date; quitline 1-800-QUIT-NOW or a cessation clinic</td></tr>
+</tbody></table></div>
+<div class="panel"><div class="ph">The 5 Rs <span>Not ready to quit</span></div><div class="pb"><p>Relevance · Risks · Rewards · Roadblocks · Repetition</p></div></div>
+<div class="panel"><div class="ph">The 5 Ds <span>Managing cravings</span></div><div class="pb"><p>Delay · Distract · Deep breathe · Drink water · Discuss</p></div></div>
+<div class="panel"><div class="ph">Nicotine replacement therapy (NRT)</div><table class="grid">
+<thead><tr><th>Form</th><th>Starting dose</th><th>Watch for</th></tr></thead><tbody>
+<tr><td><b>Patch</b> <span class="sub">OTC</span></td><td>21 mg if more than 10 cigarettes a day; 14 mg if 10 or fewer</td><td>Skin irritation, vivid dreams</td></tr>
+<tr><td><b>Gum</b> <span class="sub">OTC</span></td><td>4 mg if first cigarette within 30 min of waking; otherwise 2 mg</td><td>Sticks to dental work; avoid with dentures or TMJ disease</td></tr>
+<tr><td><b>Lozenge</b> <span class="sub">OTC</span></td><td>Same as gum</td><td>Don't chew; hiccups, mouth irritation</td></tr>
+<tr><td><b>Nasal spray</b> <span class="sub">Rx</span></td><td>1 to 2 doses per hour</td><td>Avoid with nasal polyps, rhinitis or severe reactive airway disease</td></tr>
+</tbody></table><div class="foot">Combine the patch with gum, lozenge or spray for cravings. Source: Rx for Change, Pharmacologic Product Guide (2025).</div></div>
+<div class="panel"><div class="ph">Full resources <span>Open in a new tab</span></div><ul class="links">
+<li><a href="https://www.ahrq.gov/prevention/guidelines/tobacco/5steps.html" target="_blank" rel="noopener">The 5 As: Five Major Steps to Intervention</a><span>AHRQ</span></li>
+<li><a href="https://www.ahrq.gov/prevention/guidelines/tobacco/5rs.html" target="_blank" rel="noopener">The 5 Rs: Patients Not Ready to Quit</a><span>AHRQ</span></li>
+<li><a href="https://www.canada.ca/en/health-canada/services/publications/healthy-living/smoking-triggers-coping-101-infographic.html" target="_blank" rel="noopener">Smoking Triggers and Coping 101: the 5 Ds</a><span>Health Canada</span></li>
+<li><a href="https://smokingcessationleadership.ucsf.edu/sites/smokingcessationleadership.ucsf.edu/files/2026-02/SCLC_RxforChange_Pharmacologic%20Product%20Guide_7.7.25_accessible.pdf" target="_blank" rel="noopener">Pharmacologic Product Guide (2025)</a><span>Rx for Change, UCSF · full dosing for NRT, bupropion and varenicline</span></li>
+<li><a href="https://www.cdc.gov/tobacco/campaign/tips/quit-smoking/quit-smoking-medications/how-to-use-quit-smoking-medicines/how-to-combine-medicines.html" target="_blank" rel="noopener">How to Combine Quit Smoking Medicines</a><span>CDC</span></li>
+<li><a href="https://www.ada.org/resources/ada-library/oral-health-topics/tobacco-use-and-cessation" target="_blank" rel="noopener">Tobacco Use and Cessation</a><span>American Dental Association · oral health effects and the dental team's role</span></li>
+<li><a href="https://www.uspreventiveservicestaskforce.org/uspstf/recommendation/tobacco-use-in-adults-and-pregnant-women-counseling-and-interventions" target="_blank" rel="noopener">Tobacco Smoking Cessation in Adults: Interventions (2021)</a><span>U.S. Preventive Services Task Force</span></li>
+<li><a href="https://odphp.health.gov/healthypeople/tools-action/browse-evidence-based-resources/smoking-cessation-report-surgeon-general" target="_blank" rel="noopener">Smoking Cessation: A Report of the Surgeon General (2020)</a><span>U.S. Department of Health and Human Services</span></li>
+</ul></div>`;
+
+function guideHtml() {
+  return `<div class="rules"><b>Rules for this simulation</b><ul>
+    <li><b>Enter</b> sends your message. Use <b>Shift + Enter</b> for a new line.</li>
+    <li>Your chat is saved in this browser. A new group on this laptop should click <b>Start over</b> on the Team introductions tab.</li>
+    <li>Talk to Maya as one group voice. She is a simulated D2 dental student.</li>
+  </ul></div>
+  <ol class="guide">
+    <li><span><b>Introduce your group.</b> Enter your group name, then each member says hello to Maya. Click <b>Begin Margaret's case</b>.</span></li>
+    <li><span><b>Read the chart, left to right.</b> Chart Review, Patient Info, Medications and Tobacco. Dental findings aren't in the chart: ask Maya. Use the highlighter to mark the main problems.</span></li>
+    <li><span><b>Work through 4 steps with Maya:</b> 1 Roles, 2 Referrals (top 2 and why), 3 Tobacco plan (one A at a time: Ask, Advise, Assess, Assist, Arrange), 4 Joint note (Maya drafts, you approve). The yellow box shows the current step.</span></li>
+    <li><span><b>Stuck? Ask Maya for a hint.</b> You have ${CONFIG.maxHints} per case. Hints point to where to look.</span></li>
+    <li><span><b>Finish and debrief</b> after each case. Margaret is practice; then Lucy, then Brian.</span></li>
+    <li><span><b>Final report.</b> Create it, review and edit it, sign off, then click <b>Copy for Canvas</b>.</span></li>
+  </ol>`;
+}
+
+function reportBlocks(text) {
+  const out = { title: "", meta: [], sections: [] }; let cur = null, last = null;
+  text.split(/\n/).map(l => l.trim()).filter(Boolean).forEach(l => {
+    const q = l.match(/^(\d+)\.\s+(.*)$/);
+    const c = l.match(/^(Margaret|Lucy|Brian)(\s*\([^)]*\))?\s*:\s*(.*)$/i);
+    if (q) { cur = { q: q[1] + ". " + q[2], cases: [] }; out.sections.push(cur); last = null; }
+    else if (c && cur) { last = { name: c[1] + (c[2] || ""), text: c[3] }; cur.cases.push(last); }
+    else if (!out.title && !cur) out.title = l;
+    else if (!cur) out.meta.push(l);
+    else if (last) last.text += " " + l;
+    else cur.q += " " + l;
+  });
+  return out;
+}
+function caseParts(t) {
+  return t.split(/\s*(?=\b(?:Pharmacy|Dentistry|Follow-up):)/).filter(Boolean).map(s => { const m = s.match(/^(Pharmacy|Dentistry|Follow-up):\s*(.*)$/); return m ? { label: m[1], text: m[2] } : { label: "", text: s }; });
+}
+function reportHTML(text, inline) {
+  const b = reportBlocks(text);
+  const caseHTML = c => {
+    const body = caseParts(c.text).map(p => `<p>${p.label ? `<strong>${esc(p.label)}:</strong> ` : ""}${/^not discussed\.?$/i.test(p.text) ? `<span class="nd">Not discussed</span>` : esc(p.text)}</p>`).join("");
+    return inline ? `<p><strong>${esc(c.name)}</strong></p>${body}` : `<div class="case"><b>${esc(c.name)}</b><div>${body}</div></div>`;
+  };
+  const head = `<h2>${esc(b.title || "PHAR 462 IPE Activity: Final Report")}</h2>${b.meta.map(m => `<div class="meta">${esc(m)}</div>`).join("")}`;
+  const secs = b.sections.map(s => `${inline ? "" : "<section>"}<h3>${esc(s.q)}</h3>${s.cases.map(caseHTML).join("")}${inline ? "" : "</section>"}`).join("");
+  return inline ? head + secs : `<div class="rep"><div>${head}</div>${secs}</div>`;
+}
+
+function highlightBar() {
+  const n = (T.hl[view] || []).length;
+  return `<div class="hlbar"><span><span class="sw"></span><b>Highlighter:</b> select text in the chart, then click <b>Highlight</b> to mark ${CASES[view].name}'s main problems. Click a highlight to remove it.</span><span class="sp"></span><span>${n} highlighted</span>${n ? `<button class="btn" type="button" data-hl-clear>Clear all</button>` : ""}</div>`;
+}
+
+function renderWork() {
+  const caseView = isCase(view);
+  $("main").classList.toggle("solo", !caseView);
+  document.querySelectorAll("#acts button").forEach(b => b.classList.toggle("on", b.dataset.sub === sub));
+  let body = "";
+  if (view === "team") {
+    body = `<div class="panel"><div class="ph">Your group</div><div class="pb field"><label for="group">Group name or number (appears on your final report)</label><input id="group" type="text" autocomplete="off" placeholder="e.g. Group 4" value="${esc(T.group)}"></div></div>
+      <div class="panel"><div class="ph">How this works</div><div class="pb">${guideHtml()}</div></div>
+      <div class="panel"><div class="ph">New group on this laptop?</div><div class="pb"><p>This page saves your group's conversation in this browser. A new group should start over first.</p>
+      <div class="row" id="reset-row"><button class="btn" type="button" data-reset>Start over</button></div></div></div>`;
+  } else if (view === "resources") {
+    body = RESOURCES;
+  } else if (view === "report") {
+    const any = ORDER.some(id => groupMsgs(id) > 0), signed = T.report && T.approved && T.signers;
+    body = `<div class="panel"><div class="ph">Final report <span>${!T.report ? "Not created yet" : signed ? "Signed off · ready to copy" : "Draft · needs your review"}</span></div><div class="pb">
+      ${T.reportNote ? `<p class="note-back">${esc(T.reportNote)}</p>` : ""}
+      ${T.report ? `<div class="row" style="justify-content:space-between"><p>Maya drafted this from your chat. Review it, edit anything that needs changing, then sign off below.</p><button class="btn" type="button" data-edit-report>${T.editing ? "Done editing" : "Edit report"}</button></div>
+      ${T.editing ? `<textarea class="report-text" id="report-text" aria-label="Final report">${esc(T.report)}</textarea>` : reportHTML(T.report, false)}
+      <div class="signoff">
+        <div class="field"><label for="signers">Reviewed and signed off by (pharmacy student names)</label><input id="signers" type="text" autocomplete="off" value="${esc(T.signers || "")}" placeholder="e.g. Ana Lopez, Ben Kim"></div>
+        <label class="chk"><input id="approve" type="checkbox" ${T.approved ? "checked" : ""}> We reviewed this report, made any needed edits, and approve it.</label>
+      </div>` : `<p>After you finish Brian, Maya drafts one report from all three cases, grouped by question. Your group then reviews, edits and signs off.</p>`}
+      <div class="row"><button class="btn ${T.report ? "" : "pri"}" type="button" data-make-report ${busy || !any ? "disabled" : ""}>${T.report ? "Redraft report" : "Create final report"}</button>${T.report ? `<button class="btn pri" type="button" data-copy id="copy-report" ${signed ? "" : "disabled"}>Copy for Canvas</button>` : ""}</div>
+      ${T.report ? `<p class="sub">Copy for Canvas copies the signed report, then the full chat transcript and the problems you highlighted.</p>` : ""}</div></div>`;
+  } else {
+    const C = CASES[view];
+    if (sub === "chart") {
+      const hl = highlightList(view);
+      body = `<div class="callout"><b>Your task</b>Review the chart, then collaborate with Maya Chen, D2, through Secure Chat. Ask about her dental findings and be ready to explain the reasons for your pharmacy recommendations.</div>
+        <div class="panel"><div class="ph">Chart Review · Today's visit <span>Office visit · today</span></div><div class="pb"><p data-hlk="scn">${esc(C.scenario)}</p></div></div>
+        <div class="panel"><div class="ph">Main problems you've highlighted <span>${hl.length} so far</span></div><div class="pb">${hl.length ? `<div class="hlchips">${hl.map(t => `<span class="hlchip">${esc(t)}</span>`).join("")}</div>` : `<p class="sub">Nothing highlighted yet. Select text in the scenario, Patient Info, Medications or Tobacco tabs and click Highlight.</p>`}</div></div>`;
+    } else if (sub === "info") {
+      body = `<div class="panel"><div class="ph">Patient Information Sheet <span>${C.name}</span></div><table class="grid"><tbody>${C.info.map((r, ri) => `<tr><td class="lbl">${esc(r[0])}</td><td data-hlk="info${ri}">${r[0] === "Dental" ? `<span class="dentalnote">${esc(r[1].join(" "))}</span>` : r[1].map(esc).join("<br>")}</td></tr>`).join("")}</tbody></table></div>`;
+    } else if (sub === "meds") {
+      body = `<div class="panel"><div class="ph">Medications <span>Drug history</span></div><table class="grid"><thead><tr><th>Medication</th><th>Directions</th><th>Indication</th></tr></thead><tbody>${C.meds.map((r, ri) => `<tr>${r.map((c, ci) => `<td data-hlk="med${ri}-${ci}">${esc(c)}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`;
+    } else {
+      body = `<div class="panel"><div class="ph">Tobacco Use <span>Flowsheet</span></div><table class="grid"><thead><tr><th>Measure</th><th>Value</th><th>Reference range</th></tr></thead><tbody>${C.tobacco.map((r, ri) => `<tr><td>${esc(r[0])}</td><td data-hlk="tob${ri}">${esc(r[1])}</td><td class="ref">${esc(r[2] || "")}</td></tr>`).join("")}</tbody></table>
+        <div class="foot">Scoring guides and the NRT table are in the Resources tab at the top right.</div></div>`;
+    }
+  }
+  $("work").innerHTML = bannerHtml() + (caseView ? highlightBar() : "") + body;
+  if (caseView) applyHighlights($("work"));
+}
+
+/* =====================================================================
+   RENDER: Secure Chat
+   ===================================================================== */
+function renderSteps() {
+  const p = T.phase;
+  if (p === "team") { $("steps").className = "steps intro"; $("steps").textContent = "Team introductions: each group member introduces themselves"; return; }
+  $("steps").className = "steps";
+  const s = curStep(), deb = T.debriefed[p];
+  $("steps").innerHTML = [...STAGES, { k: "Debrief", d: "Feedback" }].map((st, i) => {
+    const n = i + 1;
+    let cls = "";
+    if (n < 5) cls = s > n ? "done" : s === n ? "now" : "";
+    else cls = deb ? "done" : s >= 5 ? "now" : "";
+    const extra = n === 3 && cls === "now" && T.fiveA[p] ? `<span class="part">Now: ${FIVE_A[T.fiveA[p]]}</span>` : "";
+    return `<div class="step ${cls}" title="${esc(st.d)}"><span class="d">${cls === "done" ? "✓" : n < 5 ? n : "★"}</span><b>${n < 5 ? n + ". " : ""}${st.k}</b><span>${esc(st.d)}</span>${extra}</div>`;
+  }).join("");
+}
+function debriefHtml(m) {
+  if (m.offline) return `<div class="card debrief"><h4>Self-check: ${esc(nameOf(m.sec))}</h4><p class="sub">Maya couldn't write a full debrief right now, so talk through these as a group.</p><ol>${m.text.split("\n").map(l => `<li>${esc(l)}</li>`).join("")}</ol></div>`;
+  const lines = m.text.split(/\n+/).map(l => l.trim()).filter(Boolean).map(l => { const x = l.match(/^([A-Z][A-Za-z ]{2,30}):\s*(.*)$/); return x ? `<p><b>${esc(x[1])}:</b> ${esc(x[2])}</p>` : `<p>${esc(l)}</p>`; }).join("");
+  return `<div class="card debrief"><h4>Debrief: ${esc(nameOf(m.sec))}</h4>${lines}</div>`;
+}
+function bubble(m) {
+  if (m.who === "sys") return `<div class="sys">${esc(m.text)}</div>`;
+  if (m.who === "div") return `<div class="div">${esc(m.text)}</div>`;
+  if (m.who === "debrief") return debriefHtml(m);
+  const cls = m.who === "me" ? "me" : m.who === "hint" ? "hint" : "";
+  const who = m.who === "me" ? "Your group" : m.who === "hint" ? "Hint from Maya" : "Maya Chen, D2";
+  return `<div class="m ${cls}"><div class="who">${who} · ${esc(m.t)}</div>${esc(m.text)}</div>`;
+}
+function renderChat() {
+  $("thread").innerHTML = T.log.map(bubble).join("") + (busy && !T.log.some(m => m.temp) ? `<div class="typing">Maya is typing…</div>` : "");
+  $("msgs").scrollTop = $("msgs").scrollHeight;
+  $("chat-sub").textContent = `Dental Student (D2) · ${T.phase === "team" ? "Team introductions" : "re: " + CASES[T.phase].name}`;
+}
+function sync() {
+  const a = nextAction(), done = allDone(), wait = awaitingDebrief(), p = T.phase;
+  $("next").textContent = a.label;
+  $("next").disabled = busy || !a.ok;
+  $("next").classList.toggle("pri", a.ok && (p === "team" ? groupMsgs("team") > 0 : wait || !!T.debriefed[p]));
+  $("input").disabled = done || wait || (isCase(p) && !!T.debriefed[p]);
+  $("send").disabled = busy || $("input").disabled;
+  $("input").placeholder = done ? "All cases finished. Open the Final report tab."
+    : wait ? `Joint note approved. Click "Finish ${CASES[p].name} and debrief" below to continue.`
+    : isCase(p) && T.debriefed[p] ? `Click "${a.label}" below to continue.`
+    : p === "team" ? "Introduce yourself to Maya… (Enter sends)" : "Message Maya… (Enter sends · Shift + Enter for a new line)";
+  const left = isCase(p) ? Math.max(0, CONFIG.maxHints - (T.hintsUsed[p] || 0)) : 0;
+  const hintActive = isCase(p) && !T.debriefed[p] && curStep() <= 4;
+  $("btn-hint").textContent = !hintActive ? "Ask Maya for a hint" : left ? `Ask Maya for a hint (${left} left)` : "No hints left";
+  $("btn-hint").disabled = busy || !isCase(p) || !left || curStep() > 4 || !!T.debriefed[p];
+  $("tries").textContent = isCase(p) && !T.debriefed[p] && !wait && !a.ok ? `Finish unlocks after ${CONFIG.minMsgsPerCase} messages` : "";
+  $("engine-badge").hidden = !(CONFIG.engine === "practice" || backupNow);
+  save();
+}
+function renderAll() { renderTabs(); renderStory(); renderWork(); renderSteps(); renderChat(); sync(); }
+
+/* =====================================================================
+   HIGHLIGHTER: select chart text and mark the main problems in yellow.
+   Saved per case as {key, start, end} inside [data-hlk] blocks, listed in the copied transcript.
+   ===================================================================== */
+function wrapRange(el, start, end, hid) {
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const nodes = []; let pos = 0, n;
+  while ((n = walker.nextNode())) { const len = n.nodeValue.length; if (pos + len > start && pos < end) nodes.push([n, pos]); pos += len; }
+  nodes.forEach(([node, p0]) => {
+    const a = Math.max(start - p0, 0), b = Math.min(end - p0, node.nodeValue.length);
+    if (b <= a) return;
+    let mid = node;
+    if (a > 0) mid = node.splitText(a);
+    if (b - a < mid.nodeValue.length) mid.splitText(b - a);
+    if (!mid.nodeValue.trim()) return;
+    const m = document.createElement("mark"); m.className = "hl"; m.dataset.hid = hid; m.title = "Click to remove this highlight";
+    mid.parentNode.insertBefore(m, mid); m.appendChild(mid);
+  });
+}
+function applyHighlights(root) {
+  (T.hl[view] || []).forEach(h => { const el = root.querySelector(`[data-hlk="${h.key}"]`); if (el) wrapRange(el, h.start, h.end, h.id); });
+}
+function offsetIn(el, container, offset) { const r = document.createRange(); r.setStart(el, 0); r.setEnd(container, offset); return r.toString().length; }
+function chartBlocks() { return [...document.querySelectorAll("#work [data-hlk], #story [data-hlk]")]; }
+function addHighlightFromSelection() {
+  const sel = window.getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount || !isCase(view)) return;
+  const range = sel.getRangeAt(0); let added = 0;
+  chartBlocks().forEach(el => {
+    if (!range.intersectsNode(el)) return;
+    const start = el.contains(range.startContainer) ? offsetIn(el, range.startContainer, range.startOffset) : 0;
+    const end = el.contains(range.endContainer) ? offsetIn(el, range.endContainer, range.endOffset) : el.textContent.length;
+    const text = el.textContent.slice(start, end);
+    if (end > start && text.trim()) { (T.hl[view] ||= []).push({ id: ++hlSeq, key: el.dataset.hlk, start, end, text }); added++; }
+  });
+  sel.removeAllRanges();
+  if (added) { renderStory(); renderWork(); save(); }
+}
+function selectionInChart() {
+  const sel = window.getSelection(); if (!sel || sel.isCollapsed || !sel.rangeCount || !isCase(view)) return false;
+  const r = sel.getRangeAt(0); return chartBlocks().some(el => r.intersectsNode(el));
+}
+
+/* =====================================================================
+   EVENTS
+   ===================================================================== */
+function openGuide() { $("modal-body").innerHTML = guideHtml(); $("modal").hidden = false; $("modal-close").focus(); }
+document.addEventListener("click", e => {
+  if (!(e.target instanceof Element)) return;
+  const m = e.target.closest("mark.hl");
+  if (m && !window.getSelection().toString()) { T.hl[view] = (T.hl[view] || []).filter(h => String(h.id) !== m.dataset.hid); renderStory(); renderWork(); save(); return; }
+  const b = e.target.closest("button"); if (!b) return;
+  if (b.dataset.tab) { view = b.dataset.tab; if (isCase(view)) sub = "chart"; $("confirm").hidden = true; renderAll(); }
+  else if (b.dataset.sub) { sub = b.dataset.sub; renderWork(); save(); }
+  else if (b.dataset.goto) { if (!isCase(view)) view = isCase(T.phase) ? T.phase : "margaret"; sub = b.dataset.goto; renderAll(); }
+  else if (b.hasAttribute("data-next")) { if (!b.disabled) nextAction().run(); }
+  else if (b.hasAttribute("data-hint")) giveHint();
+  else if (b.hasAttribute("data-guide")) openGuide();
+  else if (b.hasAttribute("data-make-report")) makeReport();
+  else if (b.hasAttribute("data-copy")) copy();
+  else if (b.hasAttribute("data-edit-report")) { T.editing = !T.editing; renderWork(); }
+  else if (b.hasAttribute("data-hl-clear")) { T.hl[view] = []; renderStory(); renderWork(); save(); }
+  else if (b.hasAttribute("data-reset")) { $("reset-row").innerHTML = `<span>Delete this conversation and start over?</span><button class="btn danger" type="button" data-reset-yes>Yes, start over</button><button class="btn" type="button" data-reset-no>Cancel</button>`; }
+  else if (b.hasAttribute("data-reset-no")) renderWork();
+  else if (b.hasAttribute("data-reset-yes")) {
+    try { localStorage.removeItem(SAVE_KEY); } catch (e) {}
+    T = fresh(); view = "team"; sub = "chart"; backupNow = false;
+    say(TEAM_INTRO, "team"); renderAll(); toast("Started over.");
+  }
+});
+document.addEventListener("input", e => {
+  const id = e.target.id;
+  if (id === "group") { T.group = e.target.value.trim(); renderStory(); }
+  if (id === "report-text") T.report = e.target.value;
+  if (id === "signers") T.signers = e.target.value.trim();
+  if (id === "approve") T.approved = e.target.checked;
+  if (["report-text", "signers", "approve"].includes(id)) { const c = $("copy-report"); if (c) c.disabled = !(T.report && T.approved && T.signers); }
+  save();
+});
+$("send").addEventListener("click", send);
+$("input").addEventListener("keydown", e => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } });
+$("no").addEventListener("click", () => { $("confirm").hidden = true; });
+$("yes").addEventListener("click", () => { $("confirm").hidden = true; finish(); });
+$("btn-copy-top").addEventListener("click", copy);
+$("btn-guide").addEventListener("click", openGuide);
+$("modal-close").addEventListener("click", () => { $("modal").hidden = true; });
+$("modal").addEventListener("click", e => { if (e.target.id === "modal") $("modal").hidden = true; });
+document.addEventListener("keydown", e => { if (e.key === "Escape") $("modal").hidden = true; });
+// Highlighter button follows the mouse after a selection in the chart.
+const hlBtn = $("hl-btn");
+document.addEventListener("mouseup", e => {
+  if (!(e.target instanceof Element) || e.target.closest("#hl-btn")) return;
+  setTimeout(() => {
+    if (selectionInChart()) { hlBtn.style.left = Math.min(e.clientX + 8, window.innerWidth - 110) + "px"; hlBtn.style.top = Math.max(e.clientY - 38, 8) + "px"; hlBtn.hidden = false; }
+    else hlBtn.hidden = true;
+  }, 0);
+});
+hlBtn.addEventListener("mousedown", e => e.preventDefault());
+hlBtn.addEventListener("click", () => { addHighlightFromSelection(); hlBtn.hidden = true; });
+$("work").addEventListener("scroll", () => { hlBtn.hidden = true; });
+window.addEventListener("beforeunload", e => { if (T.log.some(m => m.who === "me") && !T.copied) { e.preventDefault(); e.returnValue = ""; } });
+
+renderAll();
+// Ask for the class code up front if the instructor set one (no code set = nothing happens).
+if (CONFIG.engine === "claude") api({ mode: "check" }).catch(() => {});
+</script>
+<noscript><div class="noscript">This simulation needs JavaScript. Please turn it on in your browser and reload the page.</div></noscript>
+</body>
+</html>
